@@ -8,62 +8,65 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Montserrat:wght@500;600&display=swap">
 <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-  :root { --bg:#fff; --ink:#1c1c1c; --muted:#686868; --line:#e5e5e5; --tile:#f3f0eb; --tile-2:#ebe6df; --black:#1c1c1c; --badge:#8fb3c9; --ok:#2f7d4f; --ng:#c0392b; --sans:"Noto Sans JP","Hiragino Sans","Yu Gothic",Meiryo,sans-serif; --en:"Montserrat",var(--sans); color-scheme: light; }
+  :root { --bg:#fff; --ink:#1c1c1c; --muted:#686868; --line:#e5e5e5; --tile:#f3f0eb; --badge:#8fb3c9; --ok:#2f7d4f; --ng:#c0392b; --sans:"Noto Sans JP","Hiragino Sans","Yu Gothic",Meiryo,sans-serif; --en:"Montserrat",var(--sans); color-scheme:light; }
   * { box-sizing:border-box; }
   html,body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:14px; line-height:1.6; }
-  body { padding-block: env(safe-area-inset-top,0px) 0; }
-  .bar { background:var(--black); color:#fff; text-align:center; font-size:12px; padding:6px 16px; }
+  body { padding-block:env(safe-area-inset-top,0px) 0; }
+  .bar { background:var(--ink); color:#fff; text-align:center; font-size:12px; padding:6px 16px; }
   .bar small { opacity:.7; margin-left:6px; }
   header { display:flex; align-items:center; gap:12px; padding:10px 16px; border-bottom:1px solid var(--line); background:#fff; position:sticky; top:env(safe-area-inset-top,0px); z-index:20; }
   .logo { display:flex; align-items:center; gap:8px; font-family:var(--en); font-weight:600; letter-spacing:.12em; font-size:18px; }
   .logo svg { width:26px; height:26px; }
   header .sp { flex:1; }
-  .ico { width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center; border:0; background:none; color:var(--ink); cursor:pointer; border-radius:8px; }
+  .ico { width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center; border:0; background:none; color:var(--ink); cursor:pointer; border-radius:8px; text-decoration:none; }
   .ico svg { width:22px; height:22px; }
-  .wrap { max-width:1120px; margin:0 auto; padding:0 16px 48px; }
-  .steps { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:14px 0 18px; }
-  .steps button { font:inherit; font-size:12px; padding:12px 6px 10px; border:1px solid transparent; border-radius:8px; background:var(--tile); color:var(--ink); cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; min-height:64px; }
-  .steps button svg { width:22px; height:22px; }
-  .steps button[aria-current="step"] { border-color:var(--black); background:#fff; font-weight:700; }
-  .steps button .n { font-family:var(--en); font-size:11px; color:var(--muted); }
-  h2 { font-size:16px; margin:0 0 10px; display:flex; align-items:baseline; gap:10px; }
-  h2 small { font-weight:400; font-size:12px; color:var(--muted); }
-  h2 .more { margin-left:auto; font-weight:400; font-size:12px; color:var(--muted); text-decoration:none; }
-  .grid { display:grid; grid-template-columns:1fr; gap:20px; }
-  @media (min-width:960px){ .grid { grid-template-columns: 1.1fr .9fr; gap:28px; } .left { position:sticky; top:70px; align-self:start; } }
-  .tabs { display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
-  .pill { font:inherit; font-size:13px; min-height:36px; padding:0 14px; border:1px solid var(--ink); border-radius:999px; background:#fff; color:var(--ink); cursor:pointer; }
-  .pill[aria-pressed="true"] { background:var(--black); color:#fff; }
-  .stage { position:relative; width:100%; aspect-ratio:4/3; background:var(--tile); border-radius:8px; overflow:hidden; border:1px solid var(--line); touch-action:none; }
+  .wrap { max-width:1040px; margin:0 auto; padding:0 16px 56px; }
+  .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:14px 0 18px; }
+  .steps button { font:inherit; font-size:13px; padding:10px 6px; border:1px solid transparent; border-radius:8px; background:var(--tile); color:var(--muted); cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; min-height:56px; }
+  .steps button .n { font-family:var(--en); font-size:11px; }
+  .steps button[aria-current="step"] { border-color:var(--ink); background:#fff; color:var(--ink); font-weight:700; }
+  .steps button.done { color:var(--ink); }
+  .panel[hidden] { display:none; }
+  h2 { font-size:17px; margin:0 0 4px; }
+  .lead { margin:0 0 14px; color:var(--muted); font-size:13px; }
+  .choose { display:grid; grid-template-columns:1fr; gap:10px; }
+  @media (min-width:700px){ .choose { grid-template-columns:1.2fr 1fr; } }
+  .big { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; min-height:150px; padding:20px; border:2px dashed #c9c4bb; border-radius:10px; background:var(--tile); cursor:pointer; text-align:center; }
+  .big b { font-size:16px; }
+  .big span { font-size:12px; color:var(--muted); }
+  .big svg { width:32px; height:32px; }
+  .big input { position:absolute; inset:0; opacity:0; width:100%; cursor:pointer; }
+  .samples { display:grid; gap:8px; }
+  .samples button { font:inherit; text-align:left; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; cursor:pointer; min-height:48px; display:flex; justify-content:space-between; align-items:center; }
+  .samples button span { font-size:12px; color:var(--muted); }
+  .samples .lbl { font-size:12px; color:var(--muted); }
+  .stage { position:relative; width:100%; aspect-ratio:4/3; background:var(--tile); border-radius:10px; overflow:hidden; border:1px solid var(--line); touch-action:none; }
   .stage canvas { display:block; width:100%; height:100%; } .stage canvas[hidden] { display:none; }
-  .stage .note { position:absolute; left:10px; top:10px; font-size:11px; color:var(--muted); background:rgba(255,255,255,.85); padding:3px 8px; border-radius:6px; pointer-events:none; }
+  .stage .note { position:absolute; left:10px; top:10px; right:10px; font-size:12px; color:var(--ink); background:rgba(255,255,255,.9); padding:6px 10px; border-radius:6px; pointer-events:none; }
   .stage .warn { position:absolute; left:10px; bottom:10px; font-size:12px; color:#fff; background:var(--ng); padding:4px 10px; border-radius:6px; }
   .stage .warn[hidden] { display:none; }
-  .tools { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; align-items:center; }
-  .btn { font:inherit; font-size:13px; font-weight:700; min-height:44px; padding:0 16px; border:1px solid var(--ink); border-radius:6px; background:#fff; color:var(--ink); cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
-  .btn.black { background:var(--black); color:#fff; }
-  .btn.sm { min-height:36px; font-weight:500; padding:0 12px; }
-  .btn:disabled { opacity:.4; cursor:default; }
-  .btn svg { width:16px; height:16px; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:10px; }
+  .row .sp { flex:1; }
+  .btn { font:inherit; font-size:14px; font-weight:700; min-height:46px; padding:0 18px; border:1px solid var(--ink); border-radius:8px; background:#fff; color:var(--ink); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; }
+  .btn.black { background:var(--ink); color:#fff; }
+  .btn.sm { min-height:38px; font-weight:500; font-size:13px; padding:0 12px; }
+  .btn.wide { width:100%; }
+  .btn:disabled { opacity:.35; cursor:default; }
+  .btn svg { width:18px; height:18px; }
+  .pill { font:inherit; font-size:13px; min-height:36px; padding:0 14px; border:1px solid var(--ink); border-radius:999px; background:#fff; color:var(--ink); cursor:pointer; }
+  .pill[aria-pressed="true"] { background:var(--ink); color:#fff; }
   .field { display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--muted); }
-  .field input { font:inherit; width:64px; min-height:36px; padding:0 8px; border:1px solid var(--line); border-radius:6px; }
-  .plans { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
-  .plans button { font:inherit; text-align:left; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; cursor:pointer; min-height:64px; }
-  .plans button b { display:block; font-size:13px; }
-  .plans button span { font-size:11px; color:var(--muted); }
-  .plans button[aria-pressed="true"] { border-color:var(--ink); background:var(--tile); }
-  .import { border:1px dashed #c9c4bb; border-radius:8px; padding:12px; background:var(--tile); font-size:12px; color:var(--muted); display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px; }
-  .import label { font-weight:700; color:var(--ink); min-height:40px; display:inline-flex; align-items:center; padding:0 14px; border:1px solid var(--ink); border-radius:6px; background:#fff; cursor:pointer; position:relative; }
-  .import input[type=file] { position:absolute; inset:0; opacity:0; width:100%; cursor:pointer; }
-  .trace { display:none; gap:8px; align-items:center; flex-wrap:wrap; }
-  .trace.on { display:flex; }
+  .field input { font:inherit; width:64px; min-height:38px; padding:0 8px; border:1px solid var(--line); border-radius:6px; }
+  .two { display:grid; grid-template-columns:1fr; gap:18px; }
+  @media (min-width:900px){ .two { grid-template-columns:1.1fr .9fr; gap:28px; } .two .left { position:sticky; top:70px; align-self:start; } }
   .chips { display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; margin-bottom:10px; scrollbar-width:none; }
   .chips::-webkit-scrollbar { display:none; }
   .cards { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
-  @media (min-width:600px) and (max-width:959px){ .cards { grid-template-columns:repeat(3,1fr);} }
-  .card { position:relative; border:0; padding:0; background:none; text-align:left; font:inherit; color:var(--ink); }
-  .card .ph { aspect-ratio:1; background:var(--tile); border-radius:6px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+  @media (min-width:600px) and (max-width:899px){ .cards { grid-template-columns:repeat(3,1fr);} }
+  .card .ph { aspect-ratio:1; background:var(--tile); border-radius:6px; display:flex; align-items:center; justify-content:center; position:relative; }
   .card .ph svg { width:60%; height:60%; stroke:#8b8378; fill:none; stroke-width:1.6; }
   .card .ph .no { position:absolute; left:0; top:0; background:var(--badge); color:#fff; font-family:var(--en); font-size:11px; padding:2px 7px; border-bottom-right-radius:6px; }
   .card .sw { display:flex; gap:4px; margin:8px 0 4px; }
@@ -74,90 +77,98 @@
   .card .pr small { font-weight:400; font-size:11px; color:var(--muted); }
   .card .put { margin-top:8px; width:100%; }
   .card.in .put { background:var(--tile); border-color:var(--line); }
-  .summary { margin-top:24px; border-top:1px solid var(--line); padding-top:18px; }
-  table { width:100%; border-collapse:collapse; font-size:13px; }
+  .placed { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .placed span { font-size:12px; background:var(--tile); padding:4px 8px 4px 10px; border-radius:999px; display:inline-flex; gap:6px; align-items:center; }
+  .placed span button { border:0; background:none; font:inherit; cursor:pointer; color:var(--muted); min-width:28px; min-height:28px; }
+  .arbox { margin-top:14px; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .arbox[hidden] { display:none; }
+  .arbox model-viewer { width:100%; aspect-ratio:4/3; background:var(--tile); --progress-bar-color:var(--ink); }
+  .arbox .in { padding:12px 14px; font-size:13px; color:var(--muted); display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+  .arbox #qr { background:#fff; padding:4px; border:1px solid var(--line); border-radius:6px; }
+  .arbox #qr img, .arbox #qr canvas { display:block; }
+  table { width:100%; border-collapse:collapse; font-size:13px; margin-top:8px; }
   th,td { text-align:left; padding:8px 6px; border-bottom:1px solid var(--line); vertical-align:top; }
   th { font-weight:500; color:var(--muted); font-size:12px; }
   td.ok { color:var(--ok); } td.ng { color:var(--ng); }
   .total { display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-top:14px; }
   .total b { font-size:20px; }
-  .placed { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
-  .placed span { font-size:12px; background:var(--tile); padding:4px 8px 4px 10px; border-radius:999px; display:inline-flex; gap:6px; align-items:center; }
-  .placed span button { border:0; background:none; font:inherit; cursor:pointer; color:var(--muted); min-width:24px; min-height:24px; }
   footer { border-top:1px solid var(--line); margin-top:32px; padding:14px 16px; font-size:11px; color:var(--muted); text-align:center; }
   footer a { color:inherit; }
-  .toast { position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--black); color:#fff; padding:10px 16px; border-radius:6px; font-size:13px; opacity:0; transition:opacity .2s; pointer-events:none; }
+  .toast { position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--ink); color:#fff; padding:10px 16px; border-radius:6px; font-size:13px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:30; }
   .toast.show { opacity:1; }
   button:focus-visible,input:focus-visible,label:focus-within { outline:2px solid var(--ink); outline-offset:2px; }
   @media (prefers-reduced-motion:reduce){ .toast{transition:none;} }
 </style>
 </head>
 <body>
-<div class="bar">図面を取り込むだけで、新居に家具を置いてみられます<small>デモ版・商品と価格は架空</small></div>
+<div class="bar">図面のスクショを取り込むだけで、新居に家具を置いてみられます<small>デモ版・商品と価格は架空</small></div>
 <header>
-  <button class="ico" aria-label="メニュー"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2.5l8 4.5v9l-8 4.5-8-4.5v-9z"/><path d="M12 11.5l8-4.5M12 11.5v9M12 11.5L4 7"/></svg>ROOMFIT</div>
   <div class="sp"></div>
-  <a class="ico" href="../" aria-label="家具をARで置く（別ページ）" title="家具をARで置く"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8V5a1 1 0 011-1h3M16 4h3a1 1 0 011 1v3M20 16v3a1 1 0 01-1 1h-3M8 20H5a1 1 0 01-1-1v-3"/><path d="M12 7l5 3v5l-5 3-5-3v-5z"/></svg></a>
-  <button class="ico" aria-label="お気に入り"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20s-7-4.5-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.5-7 10-7 10z"/></svg></button>
+  <a class="ico" href="../" aria-label="家具だけをARで置く" title="家具だけをARで置く"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8V5a1 1 0 011-1h3M16 4h3a1 1 0 011 1v3M20 16v3a1 1 0 01-1 1h-3M8 20H5a1 1 0 01-1-1v-3"/><path d="M12 7l5 3v5l-5 3-5-3v-5z"/></svg></a>
   <button class="ico" aria-label="カート" id="cart-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 4h2l2.5 11h10L20 7H6"/><circle cx="9" cy="19" r="1.3"/><circle cx="16" cy="19" r="1.3"/></svg></button>
 </header>
 
 <div class="wrap">
   <nav class="steps" aria-label="手順">
-    <button data-step="1" aria-current="step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h16v16H4z M4 12h9M13 4v8M13 12v8"/></svg>間取り<span class="n">STEP 1</span></button>
-    <button data-step="2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11h18v6H3zM5 17v2M19 17v2M6 11V8a2 2 0 012-2h8a2 2 0 012 2v3"/></svg>家具を置く<span class="n">STEP 2</span></button>
-    <button data-step="3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>3Dで内覧<span class="n">STEP 3</span></button>
-    <button data-step="4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>候補を比べる<span class="n">STEP 4</span></button>
+    <button data-step="1" aria-current="step"><span class="n">1</span>図面</button>
+    <button data-step="2"><span class="n">2</span>家具を置く</button>
+    <button data-step="3"><span class="n">3</span>見る・置く</button>
   </nav>
 
-  <div class="grid">
-    <div class="left">
-      <h2>候補物件<small>スーモで見つけた物件の図面を想定</small></h2>
-      <div class="plans" id="plans"></div>
-      <div class="import">
-        <label>図面を取り込む<input type="file" id="plan-file" accept="image/*"></label>
-        <span>図面のスクリーンショットや写真を選ぶと下に表示されます。部屋の角を順にタップし、帖数を入れて「部屋を確定」。</span>
-        <div class="trace" id="trace">
-          <span class="field">この部屋は <input id="jo" type="number" inputmode="decimal" value="6" min="1" step="0.5"> 帖</span>
-          <button class="btn sm" id="trace-done">部屋を確定</button>
-          <button class="btn sm" id="trace-undo">1点戻す</button>
-          <button class="btn sm black" id="trace-finish">図面から3Dを作る</button>
-        </div>
-      </div>
-
-      <div class="tabs">
-        <button class="pill" id="tab-2d" aria-pressed="true">平面で配置</button>
-        <button class="pill" id="tab-3d" aria-pressed="false">3Dで内覧</button>
-        <span class="field" style="margin-left:auto">視点</span>
-        <button class="pill" id="view-top" aria-pressed="true">俯瞰</button>
-        <button class="pill" id="view-walk" aria-pressed="false">立って見る</button>
-      </div>
-      <div class="stage" id="stage">
-        <canvas id="c2d"></canvas>
-        <canvas id="c3d" hidden></canvas>
-        <div class="note" id="note">家具をドラッグで移動。タップで選択。</div>
-        <div class="warn" id="warn" hidden></div>
-      </div>
-      <div class="tools">
-        <button class="btn sm" id="rot" disabled>90°回す</button>
-        <button class="btn sm" id="del" disabled>取り除く</button>
-        <span class="field" id="sel-info"></span>
-      </div>
-      <div class="placed" id="placed"></div>
+  <!-- STEP 1 -->
+  <section class="panel" id="p1">
+    <h2>新居の図面を用意する</h2>
+    <p class="lead">スーモなどでスクショした図面を選ぶか、サンプルで試せます。</p>
+    <div class="choose" id="choose">
+      <label class="big"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3M12 4v11M7 9l5-5 5 5"/></svg><b>図面のスクショを取り込む</b><span>タップして写真を選ぶ</span><input type="file" id="plan-file" accept="image/*"></label>
+      <div class="samples"><span class="lbl">サンプルで試す</span><div id="samples"></div></div>
     </div>
+    <div id="tracer" hidden>
+      <div class="stage" id="stage1"><canvas id="ct"></canvas><div class="note" id="note1">部屋の四隅を順にタップしてください</div></div>
+      <div class="row">
+        <span class="field">この部屋は <input id="jo" type="number" inputmode="decimal" value="6" min="1" step="0.5"> 帖</span>
+        <button class="btn sm" id="t-undo">1点戻す</button>
+        <button class="btn sm" id="t-room">この部屋を確定</button>
+        <span class="sp"></span>
+        <button class="btn black" id="t-finish" disabled>次へ：家具を置く</button>
+      </div>
+    </div>
+  </section>
 
+  <!-- STEP 2 -->
+  <section class="panel two" id="p2" hidden>
+    <div class="left">
+      <h2>家具を置く</h2>
+      <p class="lead">右の家具を「置く」と実寸で平面図に入ります。ドラッグで動かせます。</p>
+      <div class="stage" id="stage2"><canvas id="c2d"></canvas><div class="warn" id="warn" hidden></div></div>
+      <div class="row" id="seltools" hidden><span class="field" id="sel-info"></span><span class="sp"></span><button class="btn sm" id="rot">90°回す</button><button class="btn sm" id="del">取り除く</button></div>
+      <div class="placed" id="placed"></div>
+      <div class="row"><button class="btn wide black" id="to3">次へ：3Dで見る・自宅に置く</button></div>
+    </div>
     <div class="right">
-      <h2>家具を選ぶ<small>置くと平面図に実寸で入ります</small><a class="more" href="#" id="clear">すべて取り除く →</a></h2>
       <div class="chips" id="chips"></div>
       <div class="cards" id="cards"></div>
     </div>
-  </div>
+  </section>
 
-  <section class="summary" id="summary">
-    <h2>候補を比べる<small>置いた家具が入るか、合計いくらか</small></h2>
+  <!-- STEP 3 -->
+  <section class="panel" id="p3" hidden>
+    <h2>3Dで見る・自宅に置く</h2>
+    <p class="lead">上から見る、部屋の中に立つ、そしてスマホのカメラで今の自宅の床に実寸で置く。</p>
+    <div class="row" style="margin:0 0 10px"><button class="pill" id="view-top" aria-pressed="true">上から見る</button><button class="pill" id="view-walk" aria-pressed="false">部屋の中に立つ</button></div>
+    <div class="stage" id="stage3"><canvas id="c3d"></canvas><div class="note" id="note3">ドラッグで回転、ピンチで拡大</div></div>
+    <div class="row"><button class="btn wide black" id="ar-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8V5a1 1 0 011-1h3M16 4h3a1 1 0 011 1v3M20 16v3a1 1 0 01-1 1h-3M8 20H5a1 1 0 01-1-1v-3"/><path d="M12 7l5 3v5l-5 3-5-3v-5z"/></svg>カメラで自宅に置く（AR）</button></div>
+    <div class="arbox" id="arbox" hidden>
+      <model-viewer id="armv" alt="間取りと家具の3D" ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" ar-placement="floor" camera-controls touch-action="pan-y" shadow-intensity="1" environment-image="neutral">
+        <button class="btn black" slot="ar-button" style="position:absolute;left:12px;bottom:12px">この場所に置く</button>
+      </model-viewer>
+      <div class="in" id="arin"></div>
+    </div>
+    <div class="row" style="margin-top:18px"><span class="field">壁の高さ</span><button class="pill" id="wall-low" aria-pressed="true">低め（見渡せる）</button><button class="pill" id="wall-full" aria-pressed="false">実寸 240cm</button></div>
+    <h2 style="margin-top:22px">候補を比べる</h2>
     <div style="overflow-x:auto"><table id="cmp"><thead><tr><th>候補</th><th>広さ</th><th>置いた家具</th><th>収まり</th><th>家具の合計</th></tr></thead><tbody></tbody></table></div>
-    <div class="total"><span>この候補の家具合計</span><b id="total">¥0</b><button class="btn black" id="buy">まとめてカートに入れる</button><span class="field">本番では各ECの商品ページへ送客し、購入額の数%を収益にします。</span></div>
+    <div class="total"><span>この候補の家具合計</span><b id="total">¥0</b><button class="btn black" id="buy">まとめてカートに入れる</button></div>
   </section>
 </div>
 <footer>ROOMFIT はデモです。間取り・商品・価格は架空。3Dモデルの一部は <a href="https://github.com/KhronosGroup/glTF-Sample-Assets" target="_blank" rel="noopener">Khronos glTF Sample Assets</a>（Wayfair、CC BY 4.0）。</footer>
@@ -167,154 +178,137 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 
 const $ = id => document.getElementById(id);
-const JO = 16200; // 1帖 ≒ 1.62㎡ = 16200 cm²
+const JO = 16200;
 const rect = (x, y, w, h) => [[x, y], [x + w, y], [x + w, y + h], [x, y + h]];
+const yen = n => '¥' + n.toLocaleString('ja-JP');
 
-// ---- 候補物件（cm） ----
+// ---- 物件 ----
 const PRESETS = [
-  { id: 'A', name: '候補A 1K', desc: '洋室6帖 + キッチン', rooms: [ { name: '洋室', poly: rect(0, 0, 270, 360) }, { name: 'キッチン', poly: rect(0, 360, 270, 160) } ] },
-  { id: 'B', name: '候補B 1LDK', desc: 'LDK10帖 + 洋室6帖', rooms: [ { name: 'LDK', poly: rect(0, 0, 360, 450) }, { name: '洋室', poly: rect(360, 0, 270, 360) } ] },
-  { id: 'C', name: '候補C 2LDK', desc: 'LDK12帖 + 洋室6帖 + 洋室5帖', rooms: [ { name: 'LDK', poly: rect(0, 0, 450, 430) }, { name: '洋室1', poly: rect(450, 0, 270, 360) }, { name: '洋室2', poly: rect(0, 430, 300, 270) } ] },
+  { id: 'A', name: '1K（洋室6帖）', rooms: [{ name: '洋室', poly: rect(0, 0, 270, 360) }, { name: 'キッチン', poly: rect(0, 360, 270, 160) }] },
+  { id: 'B', name: '1LDK（LDK10帖＋洋室6帖）', rooms: [{ name: 'LDK', poly: rect(0, 0, 360, 450) }, { name: '洋室', poly: rect(360, 0, 270, 360) }] },
+  { id: 'C', name: '2LDK（LDK12帖＋洋室6帖＋5帖）', rooms: [{ name: 'LDK', poly: rect(0, 0, 450, 430) }, { name: '洋室1', poly: rect(450, 0, 270, 360) }, { name: '洋室2', poly: rect(0, 430, 300, 270) }] },
 ];
 const plans = PRESETS.map(p => ({ ...p, items: [] }));
 let plan = plans[1];
 
-// ---- 家具カタログ（架空。GLBは3点、他は箱） ----
+// ---- 家具 ----
 const CATS = ['すべて', 'ソファ', 'ベッド', 'ダイニング', 'チェア', '収納', 'デスク'];
-const ICON = {
-  'ソファ': '<path d="M3 11h18v6H3zM5 17v2M19 17v2M6 11V8a2 2 0 012-2h8a2 2 0 012 2v3"/>',
-  'ベッド': '<path d="M3 18v-7h18v7M3 11V7h6v4M5 18v2M19 18v2"/>',
-  'ダイニング': '<path d="M3 9h18M6 9v10M18 9v10M9 13h6"/>',
-  'チェア': '<path d="M7 4h8v8H7zM7 12v8M15 12v8M7 15h8"/>',
-  '収納': '<path d="M4 4h16v16H4zM4 12h16M12 4v16"/>',
-  'デスク': '<path d="M3 8h18M5 8v11M19 8v11M14 8v6h5"/>',
-};
+const ICON = { 'ソファ': '<path d="M3 11h18v6H3zM5 17v2M19 17v2M6 11V8a2 2 0 012-2h8a2 2 0 012 2v3"/>', 'ベッド': '<path d="M3 18v-7h18v7M3 11V7h6v4M5 18v2M19 18v2"/>', 'ダイニング': '<path d="M3 9h18M6 9v10M18 9v10M9 13h6"/>', 'チェア': '<path d="M7 4h8v8H7zM7 12v8M15 12v8M7 15h8"/>', '収納': '<path d="M4 4h16v16H4zM4 12h16M12 4v16"/>', 'デスク': '<path d="M3 8h18M5 8v11M19 8v11M14 8v6h5"/>' };
 const CATALOG = [
-  { id: 'sofa3', cat: 'ソファ', name: 'ベルベットソファ 3人掛け『Frankie』', w: 219, d: 102, h: 79, price: 89800, glb: '../models/GlamVelvetSofa.glb', sw: ['#1f2a44', '#8a8d88', '#d8c9a3', '#d9a6a8'] },
-  { id: 'sofa2', cat: 'ソファ', name: 'ローソファ 2人掛け『Nuvola』', w: 160, d: 85, h: 72, price: 39800, color: 0x9aa5a0, sw: ['#9aa5a0', '#c9c1b3', '#5f6f7a'] },
-  { id: 'bedsd', cat: 'ベッド', name: 'LED照明＆棚付きローベッド セミダブル', short: 'ローベッド SD', w: 125, d: 205, h: 35, price: 29800, color: 0xc9b394, sw: ['#e8e2d6', '#8c8c8c', '#3a3a3a', '#c9b394'] },
-  { id: 'bedd', cat: 'ベッド', name: 'LED照明＆棚付きローベッド ダブル', short: 'ローベッド D', w: 145, d: 205, h: 35, price: 34800, color: 0xc9b394, sw: ['#e8e2d6', '#8c8c8c', '#3a3a3a', '#c9b394'] },
-  { id: 'dt4', cat: 'ダイニング', name: 'ダイニングテーブル 4人掛け オーク', w: 135, d: 80, h: 72, price: 49800, color: 0xd2b48c, sw: ['#d2b48c', '#6b4a2b'] },
-  { id: 'dc', cat: 'ダイニング', name: 'ダイニングチェア ファブリック', w: 45, d: 52, h: 80, price: 9800, color: 0xb9b3a6, sw: ['#b9b3a6', '#6f7d6a', '#3a3a3a'] },
-  { id: 'ch1', cat: 'チェア', name: 'スリッパーチェア ピーコック', w: 83, d: 57, h: 69, price: 32800, glb: '../models/SheenChair.glb', sw: ['#0f4d52', '#d1461a'] },
-  { id: 'ch2', cat: 'チェア', name: 'ダマスク柄アームチェア', w: 68, d: 70, h: 92, price: 45800, glb: '../models/ChairDamaskPurplegold.glb', sw: ['#b9a4c9'] },
-  { id: 'tv', cat: '収納', name: 'テレビボード 150cm ウォールナット', w: 150, d: 40, h: 45, price: 19800, color: 0x6b4a2b, sw: ['#6b4a2b', '#e8e2d6'] },
-  { id: 'chest', cat: '収納', name: 'チェスト 4段 80cm', w: 80, d: 40, h: 90, price: 24800, color: 0xe8e2d6, sw: ['#e8e2d6', '#c9b394'] },
-  { id: 'desk', cat: 'デスク', name: 'ワークデスク 120cm', w: 120, d: 60, h: 72, price: 18800, color: 0xd9cbb3, sw: ['#d9cbb3', '#3a3a3a'] },
+  { id: 'sofa3', cat: 'ソファ', name: 'ベルベットソファ 3人掛け『Frankie』', short: 'ソファ 3P', w: 219, d: 102, h: 79, price: 89800, glb: '../models/GlamVelvetSofa.glb', sw: ['#1f2a44', '#8a8d88', '#d8c9a3', '#d9a6a8'] },
+  { id: 'sofa2', cat: 'ソファ', name: 'ローソファ 2人掛け『Nuvola』', short: 'ソファ 2P', w: 160, d: 85, h: 72, price: 39800, color: 0x9aa5a0, sw: ['#9aa5a0', '#c9c1b3', '#5f6f7a'] },
+  { id: 'bedsd', cat: 'ベッド', name: 'LED照明＆棚付きローベッド セミダブル', short: 'ベッド SD', w: 125, d: 205, h: 35, price: 29800, color: 0xc9b394, sw: ['#e8e2d6', '#8c8c8c', '#3a3a3a', '#c9b394'] },
+  { id: 'bedd', cat: 'ベッド', name: 'LED照明＆棚付きローベッド ダブル', short: 'ベッド D', w: 145, d: 205, h: 35, price: 34800, color: 0xc9b394, sw: ['#e8e2d6', '#8c8c8c', '#3a3a3a', '#c9b394'] },
+  { id: 'dt4', cat: 'ダイニング', name: 'ダイニングテーブル 4人掛け オーク', short: 'テーブル', w: 135, d: 80, h: 72, price: 49800, color: 0xd2b48c, sw: ['#d2b48c', '#6b4a2b'] },
+  { id: 'dc', cat: 'ダイニング', name: 'ダイニングチェア ファブリック', short: 'チェア', w: 45, d: 52, h: 80, price: 9800, color: 0xb9b3a6, sw: ['#b9b3a6', '#6f7d6a', '#3a3a3a'] },
+  { id: 'ch1', cat: 'チェア', name: 'スリッパーチェア ピーコック', short: '1人掛け', w: 83, d: 57, h: 69, price: 32800, glb: '../models/SheenChair.glb', sw: ['#0f4d52', '#d1461a'] },
+  { id: 'ch2', cat: 'チェア', name: 'ダマスク柄アームチェア', short: 'アームチェア', w: 68, d: 70, h: 92, price: 45800, glb: '../models/ChairDamaskPurplegold.glb', sw: ['#b9a4c9'] },
+  { id: 'tv', cat: '収納', name: 'テレビボード 150cm ウォールナット', short: 'TVボード', w: 150, d: 40, h: 45, price: 19800, color: 0x6b4a2b, sw: ['#6b4a2b', '#e8e2d6'] },
+  { id: 'chest', cat: '収納', name: 'チェスト 4段 80cm', short: 'チェスト', w: 80, d: 40, h: 90, price: 24800, color: 0xe8e2d6, sw: ['#e8e2d6', '#c9b394'] },
+  { id: 'desk', cat: 'デスク', name: 'ワークデスク 120cm', short: 'デスク', w: 120, d: 60, h: 72, price: 18800, color: 0xd9cbb3, sw: ['#d9cbb3', '#3a3a3a'] },
 ];
-const yen = n => '¥' + n.toLocaleString('ja-JP');
 
 // ---- 幾何 ----
 function area(poly) { let a = 0; for (let i = 0; i < poly.length; i++) { const [x1, y1] = poly[i], [x2, y2] = poly[(i + 1) % poly.length]; a += x1 * y2 - x2 * y1; } return Math.abs(a) / 2; }
 function inPoly(px, py, poly) { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const [xi, yi] = poly[i], [xj, yj] = poly[j]; if ((yi > py) !== (yj > py) && px < (xj - xi) * (py - yi) / (yj - yi) + xi) c = !c; } return c; }
 function corners(it) { const r = it.rot % 180 === 0; const w = r ? it.w : it.d, d = r ? it.d : it.w; return [[it.x - w / 2, it.y - d / 2], [it.x + w / 2, it.y - d / 2], [it.x + w / 2, it.y + d / 2], [it.x - w / 2, it.y + d / 2]]; }
-function fits(it, rooms) { return corners(it).every(([x, y]) => rooms.some(r => inPoly(x, y, r.poly))); }
+const fits = (it, rooms) => corners(it).every(([x, y]) => rooms.some(r => inPoly(x, y, r.poly)));
 function bounds(rooms) { const xs = rooms.flatMap(r => r.poly.map(p => p[0])), ys = rooms.flatMap(r => r.poly.map(p => p[1])); return { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys) }; }
 const joOf = rooms => rooms.reduce((s, r) => s + area(r.poly), 0) / JO;
 
-// ---- 2D ----
-const c2d = $('c2d'), ctx = c2d.getContext('2d');
-let view = { s: 1, ox: 0, oy: 0 }, selected = null, drag = null, traceImg = null, tracePts = [], traceRooms = [], traceScale = null;
-function fit2d() {
-  const W = c2d.clientWidth, H = c2d.clientHeight; const dpr = devicePixelRatio || 1; c2d.width = W * dpr; c2d.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  if (traceImg) { const s = Math.min(W / traceImg.width, H / traceImg.height); view = { s, ox: (W - traceImg.width * s) / 2, oy: (H - traceImg.height * s) / 2 }; return; }
-  const b = bounds(plan.rooms), pad = 40; const s = Math.min((W - pad * 2) / (b.x1 - b.x0), (H - pad * 2) / (b.y1 - b.y0));
-  view = { s, ox: (W - (b.x1 - b.x0) * s) / 2 - b.x0 * s, oy: (H - (b.y1 - b.y0) * s) / 2 - b.y0 * s };
-}
-const toPx = (x, y) => [view.ox + x * view.s, view.oy + y * view.s];
-const toCm = (px, py) => [(px - view.ox) / view.s, (py - view.oy) / view.s];
-function draw2d() {
-  const W = c2d.clientWidth, H = c2d.clientHeight; ctx.clearRect(0, 0, W, H);
-  if (traceImg) { ctx.drawImage(traceImg, view.ox, view.oy, traceImg.width * view.s, traceImg.height * view.s);
-    ctx.lineWidth = 2; for (const r of traceRooms) { ctx.strokeStyle = '#2f7d4f'; ctx.fillStyle = 'rgba(47,125,79,.15)'; ctx.beginPath(); r.px.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.closePath(); ctx.fill(); ctx.stroke(); }
-    if (tracePts.length) { ctx.strokeStyle = '#1c1c1c'; ctx.beginPath(); tracePts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke(); tracePts.forEach(p => { ctx.fillStyle = '#1c1c1c'; ctx.beginPath(); ctx.arc(p[0], p[1], 5, 0, 7); ctx.fill(); }); }
-    return; }
-  // 部屋
-  for (const r of plan.rooms) { ctx.beginPath(); r.poly.forEach((p, i) => { const q = toPx(...p); i ? ctx.lineTo(...q) : ctx.moveTo(...q); }); ctx.closePath(); ctx.fillStyle = '#fbfaf7'; ctx.fill(); ctx.lineWidth = 6; ctx.strokeStyle = '#1c1c1c'; ctx.stroke();
-    const b = bounds([r]); const [cx, cy] = toPx((b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2); ctx.fillStyle = '#9a948b'; ctx.font = '12px "Noto Sans JP"'; ctx.textAlign = 'center'; ctx.fillText(`${r.name} ${(area(r.poly) / JO).toFixed(1)}帖`, cx, cy + 4); }
-  // 家具
-  for (const it of plan.items) { const cs = corners(it).map(p => toPx(...p)); const ok = fits(it, plan.rooms); ctx.beginPath(); cs.forEach((p, i) => i ? ctx.lineTo(...p) : ctx.moveTo(...p)); ctx.closePath();
-    ctx.fillStyle = ok ? (it === selected ? 'rgba(28,28,28,.18)' : 'rgba(28,28,28,.08)') : 'rgba(192,57,43,.18)'; ctx.fill(); ctx.lineWidth = it === selected ? 2.5 : 1.5; ctx.strokeStyle = ok ? '#1c1c1c' : '#c0392b'; ctx.stroke();
-    const [cx, cy] = toPx(it.x, it.y); ctx.fillStyle = '#1c1c1c'; ctx.font = '11px "Noto Sans JP"'; ctx.textAlign = 'center'; ctx.fillText(it.short, cx, cy + 4); }
-  // 寸法
-  const b = bounds(plan.rooms); const [x0, y1] = toPx(b.x0, b.y1); const [x1] = toPx(b.x1, b.y1); ctx.strokeStyle = '#b9b3a6'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x0, y1 + 16); ctx.lineTo(x1, y1 + 16); ctx.stroke(); ctx.fillStyle = '#686868'; ctx.font = '11px "Noto Sans JP"'; ctx.textAlign = 'center'; ctx.fillText(`${Math.round(b.x1 - b.x0)} cm`, (x0 + x1) / 2, y1 + 30);
-}
-function pick(px, py) { const [x, y] = toCm(px, py); for (let i = plan.items.length - 1; i >= 0; i--) { if (inPoly(x, y, corners(plan.items[i]))) return plan.items[i]; } return null; }
+// ---- ステップ ----
+function goStep(n) { [1, 2, 3].forEach(i => { $('p' + i).hidden = i !== n; const b = document.querySelector(`.steps [data-step="${i}"]`); b.toggleAttribute('aria-current', i === n); if (i === n) b.setAttribute('aria-current', 'step'); b.classList.toggle('done', i < n); });
+  window.scrollTo({ top: 0, behavior: 'smooth' }); if (n === 2) { fit2d(); refresh(); } if (n === 3) show3d(); }
+document.querySelectorAll('.steps button').forEach(b => b.addEventListener('click', () => goStep(+b.dataset.step)));
+
+// ---- STEP1: サンプル / 図面トレース ----
+const samples = $('samples'); plans.forEach(p => { const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `<b>${p.name}</b><span>${joOf(p.rooms).toFixed(1)}帖</span>`; b.addEventListener('click', () => { plan = p; goStep(2); }); samples.appendChild(b); });
+const ct = $('ct'), tctx = ct.getContext('2d'); let img = null, tv = { s: 1, ox: 0, oy: 0 }, pts = [], rooms = [];
+function fitT() { const W = ct.clientWidth, H = ct.clientHeight, dpr = devicePixelRatio || 1; ct.width = W * dpr; ct.height = H * dpr; tctx.setTransform(dpr, 0, 0, dpr, 0, 0); const s = Math.min(W / img.width, H / img.height); tv = { s, ox: (W - img.width * s) / 2, oy: (H - img.height * s) / 2 }; }
+function drawT() { tctx.clearRect(0, 0, ct.clientWidth, ct.clientHeight); tctx.drawImage(img, tv.ox, tv.oy, img.width * tv.s, img.height * tv.s); tctx.lineWidth = 2;
+  for (const r of rooms) { tctx.strokeStyle = '#2f7d4f'; tctx.fillStyle = 'rgba(47,125,79,.18)'; tctx.beginPath(); r.px.forEach((p, i) => i ? tctx.lineTo(...p) : tctx.moveTo(...p)); tctx.closePath(); tctx.fill(); tctx.stroke(); const c = r.px.reduce((a, p) => [a[0] + p[0] / r.px.length, a[1] + p[1] / r.px.length], [0, 0]); tctx.fillStyle = '#1c1c1c'; tctx.font = 'bold 12px "Noto Sans JP"'; tctx.textAlign = 'center'; tctx.fillText(`${r.jo}帖`, c[0], c[1] + 4); }
+  if (pts.length) { tctx.strokeStyle = '#1c1c1c'; tctx.beginPath(); pts.forEach((p, i) => i ? tctx.lineTo(...p) : tctx.moveTo(...p)); tctx.stroke(); pts.forEach(p => { tctx.fillStyle = '#1c1c1c'; tctx.beginPath(); tctx.arc(p[0], p[1], 6, 0, 7); tctx.fill(); }); } }
+$('plan-file').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const im = new Image(); im.onload = () => { img = im; pts = []; rooms = []; $('choose').hidden = true; $('tracer').hidden = false; $('t-finish').disabled = true; fitT(); drawT(); }; im.src = URL.createObjectURL(f); });
+ct.addEventListener('pointerdown', e => { const r = ct.getBoundingClientRect(); pts.push([e.clientX - r.left, e.clientY - r.top]); drawT(); $('note1').textContent = pts.length < 3 ? `あと${3 - pts.length}点以上タップ` : '角を打ち終えたら、帖数を入れて「この部屋を確定」'; });
+$('t-undo').addEventListener('click', () => { pts.pop(); drawT(); });
+$('t-room').addEventListener('click', () => { if (pts.length < 3) { toast('角を3点以上タップしてください'); return; } rooms.push({ px: pts, jo: +$('jo').value || 6 }); pts = []; drawT(); $('t-finish').disabled = false; $('note1').textContent = `部屋${rooms.length}を登録。別の部屋があれば続けてタップ、なければ「次へ」`; });
+$('t-finish').addEventListener('click', () => { const f = rooms[0]; const cmPerPx = Math.sqrt(f.jo * JO / area(f.px)); const cv = document.createElement('canvas'); cv.width = img.width; cv.height = img.height; cv.getContext('2d').drawImage(img, 0, 0); const tex = cv.toDataURL('image/jpeg', .85);
+  const toCm = p => [Math.round((p[0] - tv.ox) / tv.s * cmPerPx), Math.round((p[1] - tv.oy) / tv.s * cmPerPx)];
+  const p = { id: 'D' + plans.length, name: `取り込んだ図面${plans.length - 2}`, rooms: rooms.map((r, i) => ({ name: `部屋${i + 1}`, poly: r.px.map(toCm) })), items: [], tex, texW: img.width * cmPerPx / tv.s, texH: img.height * cmPerPx / tv.s, texOff: [(-tv.ox) / tv.s * cmPerPx, (-tv.oy) / tv.s * cmPerPx] };
+  plans.push(p); plan = p; $('choose').hidden = false; $('tracer').hidden = true; $('plan-file').value = ''; goStep(2); toast('図面を実寸に換算しました'); });
+
+// ---- STEP2: 平面配置 ----
+const c2d = $('c2d'), ctx = c2d.getContext('2d'); let view = { s: 1, ox: 0, oy: 0 }, selected = null, drag = null;
+function fit2d() { const W = c2d.clientWidth, H = c2d.clientHeight, dpr = devicePixelRatio || 1; c2d.width = W * dpr; c2d.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); const b = bounds(plan.rooms), pad = 36; const s = Math.min((W - pad * 2) / (b.x1 - b.x0), (H - pad * 2) / (b.y1 - b.y0)); view = { s, ox: (W - (b.x1 - b.x0) * s) / 2 - b.x0 * s, oy: (H - (b.y1 - b.y0) * s) / 2 - b.y0 * s }; }
+const toPx = (x, y) => [view.ox + x * view.s, view.oy + y * view.s]; const toCm = (px, py) => [(px - view.ox) / view.s, (py - view.oy) / view.s];
+function draw2d() { ctx.clearRect(0, 0, c2d.clientWidth, c2d.clientHeight);
+  for (const r of plan.rooms) { ctx.beginPath(); r.poly.forEach((p, i) => { const q = toPx(...p); i ? ctx.lineTo(...q) : ctx.moveTo(...q); }); ctx.closePath(); ctx.fillStyle = '#fbfaf7'; ctx.fill(); ctx.lineWidth = 6; ctx.strokeStyle = '#1c1c1c'; ctx.stroke(); const b = bounds([r]); const [lx, ly] = toPx(b.x0, b.y0); ctx.fillStyle = '#9a948b'; ctx.font = '12px "Noto Sans JP"'; ctx.textAlign = 'left'; ctx.fillText(`${r.name} ${(area(r.poly) / JO).toFixed(1)}帖`, lx + 10, ly + 18); }
+  for (const it of plan.items) { const cs = corners(it).map(p => toPx(...p)); const ok = fits(it, plan.rooms); ctx.beginPath(); cs.forEach((p, i) => i ? ctx.lineTo(...p) : ctx.moveTo(...p)); ctx.closePath(); ctx.fillStyle = ok ? (it === selected ? 'rgba(28,28,28,.2)' : 'rgba(28,28,28,.08)') : 'rgba(192,57,43,.18)'; ctx.fill(); ctx.lineWidth = it === selected ? 2.5 : 1.5; ctx.strokeStyle = ok ? '#1c1c1c' : '#c0392b'; ctx.stroke(); const [cx, cy] = toPx(it.x, it.y); ctx.fillStyle = '#1c1c1c'; ctx.font = '11px "Noto Sans JP"'; ctx.textAlign = 'center'; ctx.fillText(it.short, cx, cy + 4); }
+  const b = bounds(plan.rooms); const [x0, y1] = toPx(b.x0, b.y1); const [x1] = toPx(b.x1, b.y1); ctx.strokeStyle = '#b9b3a6'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x0, y1 + 14); ctx.lineTo(x1, y1 + 14); ctx.stroke(); ctx.fillStyle = '#686868'; ctx.font = '11px "Noto Sans JP"'; ctx.textAlign = 'center'; ctx.fillText(`${Math.round(b.x1 - b.x0)} cm`, (x0 + x1) / 2, y1 + 28); }
 const pos = e => { const r = c2d.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
-c2d.addEventListener('pointerdown', e => { const [px, py] = pos(e); if (traceImg) { tracePts.push([px, py]); draw2d(); return; } const it = pick(px, py); select(it); if (it) { drag = { it, dx: it.x - toCm(px, py)[0], dy: it.y - toCm(px, py)[1] }; c2d.setPointerCapture(e.pointerId); } });
+function pick(px, py) { const [x, y] = toCm(px, py); for (let i = plan.items.length - 1; i >= 0; i--) if (inPoly(x, y, corners(plan.items[i]))) return plan.items[i]; return null; }
+c2d.addEventListener('pointerdown', e => { const [px, py] = pos(e); const it = pick(px, py); select(it); if (it) { const [x, y] = toCm(px, py); drag = { it, dx: it.x - x, dy: it.y - y }; c2d.setPointerCapture(e.pointerId); } });
 c2d.addEventListener('pointermove', e => { if (!drag) return; const [x, y] = toCm(...pos(e)); drag.it.x = Math.round(x + drag.dx); drag.it.y = Math.round(y + drag.dy); draw2d(); });
 c2d.addEventListener('pointerup', () => { if (drag) { drag = null; refresh(); } });
-function select(it) { selected = it; $('rot').disabled = $('del').disabled = !it; $('sel-info').textContent = it ? `${it.name}　${it.w}×${it.d}×${it.h} cm` : ''; draw2d(); }
+function select(it) { selected = it; $('seltools').hidden = !it; $('sel-info').textContent = it ? `${it.short}　${it.w}×${it.d}×${it.h} cm` : ''; draw2d(); }
 $('rot').addEventListener('click', () => { if (selected) { selected.rot = (selected.rot + 90) % 360; refresh(); } });
 $('del').addEventListener('click', () => { if (selected) { plan.items = plan.items.filter(i => i !== selected); select(null); refresh(); } });
-$('clear').addEventListener('click', e => { e.preventDefault(); plan.items = []; select(null); refresh(); });
-
-// ---- 図面トレース ----
-$('plan-file').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const img = new Image(); img.onload = () => { traceImg = img; tracePts = []; traceRooms = []; show2d(); fit2d(); draw2d(); $('trace').classList.add('on'); $('note').textContent = '部屋の角を順にタップ（3点以上）。帖数を入れて「部屋を確定」。'; toast('図面を表示しました'); }; img.src = URL.createObjectURL(f); });
-$('trace-undo').addEventListener('click', () => { tracePts.pop(); draw2d(); });
-$('trace-done').addEventListener('click', () => { if (tracePts.length < 3) { toast('角を3点以上タップしてください'); return; } const jo = +$('jo').value || 6; traceRooms.push({ px: tracePts, jo, name: `部屋${traceRooms.length + 1}` }); tracePts = []; draw2d(); toast(`部屋${traceRooms.length} を ${jo} 帖として登録`); });
-$('trace-finish').addEventListener('click', () => { if (!traceRooms.length) { toast('先に部屋を確定してください'); return; }
-  const first = traceRooms[0]; const pxArea = area(first.px); const cmPerPx = Math.sqrt(first.jo * JO / pxArea); // 最初の部屋の帖数で縮尺を決める
-  const rooms = traceRooms.map(r => ({ name: `${r.name}（${r.jo}帖）`, poly: r.px.map(p => [Math.round(p[0] * cmPerPx), Math.round(p[1] * cmPerPx)]) }));
-  const p = { id: 'D' + plans.length, name: `取り込んだ図面 ${plans.length - 2}`, desc: rooms.map(r => r.name).join(' + '), rooms, items: [] }; plans.push(p); traceImg = null; traceRooms = []; $('trace').classList.remove('on'); $('plan-file').value = ''; renderPlans(); setPlan(p); toast('図面から3Dを作りました。家具を置けます'); });
-
-// ---- 3D ----
-const c3d = $('c3d'); let renderer, scene, camera, controls, group, walkMode = false; const loader = new GLTFLoader(); const glbCache = {};
-function init3d() { renderer = new THREE.WebGLRenderer({ canvas: c3d, antialias: true }); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace; scene = new THREE.Scene(); scene.background = new THREE.Color(0xf3f0eb);
-  camera = new THREE.PerspectiveCamera(55, 4 / 3, 1, 5000); controls = new OrbitControls(camera, c3d); controls.maxPolarAngle = Math.PI / 2 - 0.02; controls.enableDamping = true;
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xd9d0c0, 1.1)); const sun = new THREE.DirectionalLight(0xffffff, 1.6); sun.position.set(300, 600, 200); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); const sc = sun.shadow.camera; sc.left = sc.bottom = -800; sc.right = sc.top = 800; sc.far = 2000; scene.add(sun); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  group = new THREE.Group(); scene.add(group); (function loop() { requestAnimationFrame(loop); if (!c3d.hidden) { controls.update(); renderer.render(scene, camera); } })(); }
-function build3d() { group.clear(); const H = walkMode ? 240 : 110, T = 8;
-  const floorMat = new THREE.MeshStandardMaterial({ color: 0xd9c7a8, roughness: .9, side: THREE.DoubleSide }), wallMat = new THREE.MeshStandardMaterial({ color: 0xf6f4ef, roughness: .95 });
-  for (const r of plan.rooms) { const sh = new THREE.Shape(r.poly.map(p => new THREE.Vector2(p[0], -p[1]))); const floor = new THREE.Mesh(new THREE.ShapeGeometry(sh), floorMat); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; group.add(floor);
-    for (let i = 0; i < r.poly.length; i++) { const [x1, y1] = r.poly[i], [x2, y2] = r.poly[(i + 1) % r.poly.length]; const len = Math.hypot(x2 - x1, y2 - y1); const w = new THREE.Mesh(new THREE.BoxGeometry(len, H, T), wallMat); w.position.set((x1 + x2) / 2, H / 2, (y1 + y2) / 2); w.rotation.y = -Math.atan2(y2 - y1, x2 - x1); w.castShadow = w.receiveShadow = true; group.add(w); } }
-  for (const it of plan.items) placeMesh(it);
-  const b = bounds(plan.rooms); const cx = (b.x0 + b.x1) / 2, cz = (b.y0 + b.y1) / 2, span = Math.max(b.x1 - b.x0, b.y1 - b.y0);
-  if (walkMode) { const r0 = plan.rooms[0]; const rb = bounds([r0]); camera.position.set(rb.x0 + 70, 150, rb.y1 - 70); const dir = new THREE.Vector3((rb.x0 + rb.x1) / 2, 130, (rb.y0 + rb.y1) / 2).sub(camera.position).normalize(); controls.target.copy(camera.position).addScaledVector(dir, 20); controls.minDistance = controls.maxDistance = 20; controls.enableZoom = false; controls.enablePan = false; controls.rotateSpeed = -0.4; }
-  else { camera.position.set(cx + span * .6, span * .9, cz + span * 1.1); controls.target.set(cx, 0, cz); controls.minDistance = 100; controls.maxDistance = 4000; controls.enableZoom = true; controls.enablePan = true; controls.rotateSpeed = 1; }
-  controls.update(); }
-function placeMesh(it) { const def = CATALOG.find(c => c.id === it.cid); const holder = new THREE.Group(); holder.position.set(it.x, 0, it.y); holder.rotation.y = -it.rot * Math.PI / 180; group.add(holder);
-  if (def.glb) { const add = g => { const m = g.scene.clone(); const box = new THREE.Box3().setFromObject(m); const size = new THREE.Vector3(); box.getSize(size); m.scale.setScalar(it.w / size.x); const b2 = new THREE.Box3().setFromObject(m); m.position.y = -b2.min.y; m.traverse(o => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; } }); holder.add(m); };
-    if (glbCache[def.glb]) add(glbCache[def.glb]); else loader.load(def.glb, g => { glbCache[def.glb] = g; add(g); }); }
-  else { const m = new THREE.Mesh(new THREE.BoxGeometry(it.w, it.h, it.d), new THREE.MeshStandardMaterial({ color: def.color, roughness: .8 })); m.position.y = it.h / 2; m.castShadow = m.receiveShadow = true; holder.add(m); } }
-function size3d() { const W = c3d.clientWidth, H = c3d.clientHeight; renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix(); }
-
-// ---- 表示切替 ----
-function show2d() { c2d.hidden = false; c3d.hidden = true; $('tab-2d').setAttribute('aria-pressed', true); $('tab-3d').setAttribute('aria-pressed', false); $('note').textContent = '家具をドラッグで移動。タップで選択。'; fit2d(); draw2d(); }
-function show3d() { c2d.hidden = true; c3d.hidden = false; $('tab-2d').setAttribute('aria-pressed', false); $('tab-3d').setAttribute('aria-pressed', true); $('note').textContent = walkMode ? 'ドラッグで見回す。' : 'ドラッグで回転、ピンチで拡大。'; if (!renderer) init3d(); size3d(); build3d(); }
-$('tab-2d').addEventListener('click', show2d); $('tab-3d').addEventListener('click', show3d);
-$('view-top').addEventListener('click', () => { walkMode = false; $('view-top').setAttribute('aria-pressed', true); $('view-walk').setAttribute('aria-pressed', false); show3d(); });
-$('view-walk').addEventListener('click', () => { walkMode = true; $('view-top').setAttribute('aria-pressed', false); $('view-walk').setAttribute('aria-pressed', true); show3d(); });
-document.querySelectorAll('.steps button').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.steps button').forEach(x => x.removeAttribute('aria-current')); b.setAttribute('aria-current', 'step'); const s = b.dataset.step; if (s === '3') show3d(); else if (s === '4') $('summary').scrollIntoView({ behavior: 'smooth' }); else if (s === '2') { show2d(); $('cards').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } else { show2d(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }));
-
-// ---- 物件切替 ----
-function renderPlans() { const el = $('plans'); el.innerHTML = ''; plans.forEach(p => { const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-pressed', p === plan); b.innerHTML = `<b>${p.name}</b><span>${p.desc}・${joOf(p.rooms).toFixed(1)}帖</span>`; b.addEventListener('click', () => setPlan(p)); el.appendChild(b); }); el.style.gridTemplateColumns = `repeat(${Math.min(plans.length, 3)},1fr)`; }
-function setPlan(p) { plan = p; selected = null; renderPlans(); fit2d(); refresh(); if (!c3d.hidden) build3d(); }
-
-// ---- カタログ ----
+$('to3').addEventListener('click', () => goStep(3));
 let cat = 'すべて';
 function renderChips() { const el = $('chips'); el.innerHTML = ''; CATS.forEach(c => { const b = document.createElement('button'); b.className = 'pill'; b.type = 'button'; b.textContent = c; b.setAttribute('aria-pressed', c === cat); b.addEventListener('click', () => { cat = c; renderChips(); renderCards(); }); el.appendChild(b); }); }
 function renderCards() { const el = $('cards'); el.innerHTML = ''; CATALOG.filter(c => cat === 'すべて' || c.cat === cat).forEach((c, i) => { const n = plan.items.filter(it => it.cid === c.id).length; const d = document.createElement('div'); d.className = 'card' + (n ? ' in' : '');
-  d.innerHTML = `<div class="ph"><span class="no">${i + 1}</span><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">${ICON[c.cat]}</svg></div><div class="sw">${c.sw.map(s => `<i style="background:${s}"></i>`).join('')}</div><div class="nm">${c.name}</div><div class="sz">幅${c.w}×奥行${c.d}×高さ${c.h} cm</div><div class="pr">${yen(c.price)}<small>〜</small></div><button class="btn sm put" type="button">${n ? `置いてある（${n}）・もう1つ置く` : '平面図に置く'}</button>`;
+  d.innerHTML = `<div class="ph"><span class="no">${i + 1}</span><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">${ICON[c.cat]}</svg></div><div class="sw">${c.sw.map(s => `<i style="background:${s}"></i>`).join('')}</div><div class="nm">${c.name}</div><div class="sz">幅${c.w}×奥行${c.d}×高さ${c.h} cm</div><div class="pr">${yen(c.price)}<small>〜</small></div><button class="btn sm put" type="button">${n ? `置いてある（${n}）・もう1つ` : '置く'}</button>`;
   d.querySelector('.put').addEventListener('click', () => add(c)); el.appendChild(d); }); }
-function add(c) { const b = bounds(plan.rooms); const it = { cid: c.id, name: c.name, short: c.short || c.name.split(/[ 『]/)[0], w: c.w, d: c.d, h: c.h, price: c.price, rot: 0, x: Math.round(b.x0 + c.w / 2 + 20 + plan.items.length * 15), y: Math.round(b.y0 + c.d / 2 + 20 + plan.items.length * 15) }; plan.items.push(it); select(it); refresh(); if (!c3d.hidden) build3d(); toast(`${it.short} を置きました。ドラッグで動かせます`); }
-
-// ---- 集計 ----
+function add(c) { const b = bounds(plan.rooms); const it = { cid: c.id, short: c.short, w: c.w, d: c.d, h: c.h, price: c.price, rot: 0, x: Math.round(b.x0 + c.w / 2 + 20 + plan.items.length * 15), y: Math.round(b.y0 + c.d / 2 + 20 + plan.items.length * 15) }; plan.items.push(it); select(it); refresh(); toast(`${c.short} を置きました。ドラッグで動かせます`); $('stage2').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
 function refresh() { draw2d(); renderCards(); const bad = plan.items.filter(it => !fits(it, plan.rooms)); $('warn').hidden = !bad.length; $('warn').textContent = bad.length ? `${bad.map(b => b.short).join('・')} が壁からはみ出しています` : '';
-  $('placed').innerHTML = plan.items.map((it, i) => `<span>${it.short} ${it.w}×${it.d}<button type="button" aria-label="${it.short}を取り除く" data-i="${i}">×</button></span>`).join('');
-  $('placed').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { plan.items.splice(+b.dataset.i, 1); select(null); refresh(); }));
-  const tb = $('cmp').querySelector('tbody'); tb.innerHTML = plans.map(p => { const bad = p.items.filter(it => !fits(it, p.rooms)).length; const total = p.items.reduce((s, it) => s + it.price, 0); return `<tr${p === plan ? ' style="background:var(--tile)"' : ''}><td><b>${p.name}</b></td><td>${joOf(p.rooms).toFixed(1)}帖</td><td>${p.items.length ? p.items.map(i => i.short).join('、') : '—'}</td><td class="${p.items.length ? (bad ? 'ng' : 'ok') : ''}">${p.items.length ? (bad ? `${bad}点はみ出し` : 'すべて収まる') : '—'}</td><td>${yen(total)}</td></tr>`; }).join('');
+  $('placed').innerHTML = plan.items.map((it, i) => `<span>${it.short} ${it.w}×${it.d}<button type="button" aria-label="${it.short}を取り除く" data-i="${i}">×</button></span>`).join(''); $('placed').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { plan.items.splice(+b.dataset.i, 1); select(null); refresh(); }));
+  $('cmp').querySelector('tbody').innerHTML = plans.map(p => { const bad = p.items.filter(it => !fits(it, p.rooms)).length; const total = p.items.reduce((s, it) => s + it.price, 0); return `<tr${p === plan ? ' style="background:var(--tile)"' : ''}><td><b>${p.name}</b></td><td>${joOf(p.rooms).toFixed(1)}帖</td><td>${p.items.length ? p.items.map(i => i.short).join('、') : '—'}</td><td class="${p.items.length ? (bad ? 'ng' : 'ok') : ''}">${p.items.length ? (bad ? `${bad}点はみ出し` : 'すべて収まる') : '—'}</td><td>${yen(total)}</td></tr>`; }).join('');
   $('total').textContent = yen(plan.items.reduce((s, it) => s + it.price, 0)); }
+
+// ---- STEP3: 3D ----
+const c3d = $('c3d'); let renderer, scene, camera, controls, group, walkMode = false, wallFull = false; const loader = new GLTFLoader(); const glbCache = {}; const texCache = {};
+function init3d() { renderer = new THREE.WebGLRenderer({ canvas: c3d, antialias: true }); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; scene = new THREE.Scene(); scene.background = new THREE.Color(0xf3f0eb);
+  camera = new THREE.PerspectiveCamera(55, 4 / 3, 1, 5000); controls = new OrbitControls(camera, c3d); controls.maxPolarAngle = Math.PI / 2 - 0.02; controls.enableDamping = true;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xd9d0c0, 1.1)); const sun = new THREE.DirectionalLight(0xffffff, 1.6); sun.position.set(300, 600, 200); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); const sc = sun.shadow.camera; sc.left = sc.bottom = -800; sc.right = sc.top = 800; sc.far = 2000; scene.add(sun);
+  group = new THREE.Group(); scene.add(group); (function loop() { requestAnimationFrame(loop); if (!$('p3').hidden) { controls.update(); renderer.render(scene, camera); } })(); }
+function floorMaterial() { if (!plan.tex) return new THREE.MeshStandardMaterial({ color: 0xd9c7a8, roughness: .9, side: THREE.DoubleSide }); if (!texCache[plan.id]) { const t = new THREE.TextureLoader().load(plan.tex); t.colorSpace = THREE.SRGBColorSpace; texCache[plan.id] = t; } return new THREE.MeshStandardMaterial({ map: texCache[plan.id], roughness: .95, side: THREE.DoubleSide }); }
+function buildInto(g, H) { const T = 8; const wallMat = new THREE.MeshStandardMaterial({ color: 0xf6f4ef, roughness: .95 }); const fm = floorMaterial();
+  for (const r of plan.rooms) { const sh = new THREE.Shape(r.poly.map(p => new THREE.Vector2(p[0], -p[1]))); const geo = new THREE.ShapeGeometry(sh);
+    if (plan.tex) { const uv = geo.attributes.uv, ps = geo.attributes.position; for (let i = 0; i < ps.count; i++) { const x = ps.getX(i), y = -ps.getY(i); uv.setXY(i, (x - plan.texOff[0]) / plan.texW, 1 - (y - plan.texOff[1]) / plan.texH); } uv.needsUpdate = true; }
+    const floor = new THREE.Mesh(geo, fm); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; g.add(floor);
+    for (let i = 0; i < r.poly.length; i++) { const [x1, y1] = r.poly[i], [x2, y2] = r.poly[(i + 1) % r.poly.length]; const len = Math.hypot(x2 - x1, y2 - y1); const w = new THREE.Mesh(new THREE.BoxGeometry(len, H, T), wallMat); w.position.set((x1 + x2) / 2, H / 2, (y1 + y2) / 2); w.rotation.y = -Math.atan2(y2 - y1, x2 - x1); w.castShadow = w.receiveShadow = true; g.add(w); } }
+  return Promise.all(plan.items.map(it => placeMesh(g, it))); }
+function placeMesh(g, it) { return new Promise(res => { const def = CATALOG.find(c => c.id === it.cid); const holder = new THREE.Group(); holder.position.set(it.x, 0, it.y); holder.rotation.y = -it.rot * Math.PI / 180; g.add(holder);
+  if (def.glb) { const add = gl => { const m = gl.scene.clone(); const size = new THREE.Vector3(); new THREE.Box3().setFromObject(m).getSize(size); m.scale.setScalar(it.w / size.x); const b2 = new THREE.Box3().setFromObject(m); m.position.y = -b2.min.y; m.traverse(o => { if (o.isMesh) o.castShadow = o.receiveShadow = true; }); holder.add(m); res(); }; if (glbCache[def.glb]) add(glbCache[def.glb]); else loader.load(def.glb, gl => { glbCache[def.glb] = gl; add(gl); }, undefined, () => res()); }
+  else { const m = new THREE.Mesh(new THREE.BoxGeometry(it.w, it.h, it.d), new THREE.MeshStandardMaterial({ color: def.color, roughness: .8 })); m.position.y = it.h / 2; m.castShadow = m.receiveShadow = true; holder.add(m); res(); } }); }
+function build3d() { group.clear(); buildInto(group, walkMode || wallFull ? 240 : 110); const b = bounds(plan.rooms); const cx = (b.x0 + b.x1) / 2, cz = (b.y0 + b.y1) / 2, span = Math.max(b.x1 - b.x0, b.y1 - b.y0);
+  if (walkMode) { const rb = bounds([plan.rooms[0]]); camera.position.set(rb.x0 + 70, 150, rb.y1 - 70); const dir = new THREE.Vector3((rb.x0 + rb.x1) / 2, 130, (rb.y0 + rb.y1) / 2).sub(camera.position).normalize(); controls.target.copy(camera.position).addScaledVector(dir, 20); controls.minDistance = controls.maxDistance = 20; controls.enableZoom = false; controls.enablePan = false; controls.rotateSpeed = -0.4; $('note3').textContent = 'ドラッグで見回す'; }
+  else { camera.position.set(cx + span * .6, span * .9, cz + span * 1.1); controls.target.set(cx, 0, cz); controls.minDistance = 100; controls.maxDistance = 4000; controls.enableZoom = true; controls.enablePan = true; controls.rotateSpeed = 1; $('note3').textContent = 'ドラッグで回転、ピンチで拡大'; }
+  controls.update(); }
+function size3d() { const W = c3d.clientWidth, H = c3d.clientHeight; renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix(); }
+function show3d() { if (!renderer) init3d(); size3d(); build3d(); $('arbox').hidden = true; }
+$('view-top').addEventListener('click', () => { walkMode = false; $('view-top').setAttribute('aria-pressed', true); $('view-walk').setAttribute('aria-pressed', false); build3d(); });
+$('view-walk').addEventListener('click', () => { walkMode = true; $('view-top').setAttribute('aria-pressed', false); $('view-walk').setAttribute('aria-pressed', true); build3d(); });
+$('wall-low').addEventListener('click', () => { wallFull = false; $('wall-low').setAttribute('aria-pressed', true); $('wall-full').setAttribute('aria-pressed', false); build3d(); $('arbox').hidden = true; });
+$('wall-full').addEventListener('click', () => { wallFull = true; $('wall-low').setAttribute('aria-pressed', false); $('wall-full').setAttribute('aria-pressed', true); build3d(); $('arbox').hidden = true; });
+
+// ---- AR: 間取り＋家具をGLBに書き出して model-viewer に渡す ----
+$('ar-go').addEventListener('click', async () => { const btn = $('ar-go'); btn.disabled = true; btn.textContent = '3Dデータを作成中…'; try { const g = new THREE.Group(); await buildInto(g, wallFull ? 240 : 110); g.scale.setScalar(0.01); g.updateMatrixWorld(true);
+    const glb = await new Promise((res, rej) => new GLTFExporter().parse(g, res, rej, { binary: true })); const url = URL.createObjectURL(new Blob([glb], { type: 'model/gltf-binary' })); const mv = $('armv'); mv.src = url; $('arbox').hidden = false; $('arbox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => { const can = mv.canActivateAR; const box = $('arin'); box.innerHTML = can ? '「この場所に置く」を押すとカメラが起動し、今いる部屋の床に間取りと家具が実寸で現れます。壁の中に歩いて入れます。' : '<div id="qr"></div><div>この端末ではカメラ配置ができません。スマホでこのQRを読み取り、同じ手順で図面を取り込むとカメラで置けます。</div>'; if (!can && window.QRCode) new QRCode(document.getElementById('qr'), { text: location.href.split('#')[0], width: 96, height: 96, correctLevel: QRCode.CorrectLevel.M }); }, 400);
+  } catch (e) { toast('3Dデータの作成に失敗しました'); console.error(e); } finally { btn.disabled = false; btn.innerHTML = btn.dataset.label; } });
+$('ar-go').dataset.label = $('ar-go').innerHTML;
+
+// ---- その他 ----
 $('buy').addEventListener('click', () => toast(`${plan.items.length}点をカートに入れました（デモ）`));
 $('cart-ico').addEventListener('click', () => toast(`カート：${plan.items.length}点 ${$('total').textContent}`));
 let tt; function toast(m) { const t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 2400); }
-
-// ---- 初期化 ----
-plans[1].items = [ { cid: 'sofa3', name: CATALOG[0].name, short: 'ベルベットソファ', w: 219, d: 102, h: 79, price: 89800, rot: 0, x: 180, y: 110 }, { cid: 'dt4', name: CATALOG[4].name, short: 'ダイニングテーブル', w: 135, d: 80, h: 72, price: 49800, rot: 0, x: 200, y: 330 }, { cid: 'bedsd', name: CATALOG[2].name, short: 'ローベッド SD', w: 125, d: 205, h: 35, price: 29800, rot: 0, x: 490, y: 180 } ];
-renderPlans(); renderChips(); fit2d(); refresh();
-new ResizeObserver(() => { fit2d(); draw2d(); if (renderer) size3d(); }).observe($('stage'));
+plans[1].items = [{ cid: 'sofa3', short: 'ソファ 3P', w: 219, d: 102, h: 79, price: 89800, rot: 0, x: 180, y: 110 }, { cid: 'dt4', short: 'テーブル', w: 135, d: 80, h: 72, price: 49800, rot: 0, x: 200, y: 330 }, { cid: 'bedsd', short: 'ベッド SD', w: 125, d: 205, h: 35, price: 29800, rot: 0, x: 490, y: 180 }];
+renderChips(); refresh();
+new ResizeObserver(() => { if (!$('p2').hidden) { fit2d(); draw2d(); } if (renderer && !$('p3').hidden) size3d(); if (img && !$('tracer').hidden) { fitT(); drawT(); } }).observe(document.body);
 </script>
 </body>
 </html>
