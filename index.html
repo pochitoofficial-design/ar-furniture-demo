@@ -97,6 +97,27 @@
   .metrics em { display: block; font-style: normal; font-family: var(--mono); font-size: 11px; color: var(--muted); }
   .metrics-note { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; color: var(--muted); }
   .metrics-note button { font: inherit; font-size: 12px; background: none; border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; color: var(--muted); cursor: pointer; }
+
+  .thumbs button { min-height: 44px; }
+  .colors { margin: 0 0 14px; }
+  .colors .lbl { display: block; font-size: 11px; color: var(--muted); letter-spacing: .06em; margin-bottom: 6px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 10px; font: inherit; font-size: 13px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); cursor: pointer; transition: border-color .15s, background .15s; }
+  .chip i { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(0,0,0,.15); background: var(--sw, var(--surface-2)); }
+  .chip[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+  .chip svg { width: 14px; height: 14px; display: none; }
+  .chip[aria-pressed="true"] svg { display: block; }
+  .drop { margin-top: 12px; padding: 14px; border: 1px dashed var(--line); border-radius: 10px; background: var(--surface); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 13px; color: var(--muted); }
+  .drop.over { border-color: var(--accent); background: var(--accent-soft); }
+  .drop label { font: inherit; font-weight: 700; color: var(--ink); min-height: 44px; display: inline-flex; align-items: center; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); cursor: pointer; }
+  .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .drop label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .embed { position: relative; }
+  .embed pre { margin: 0; padding: 12px 14px; background: var(--surface-2); border-radius: 8px; font: 12.5px/1.6 var(--mono); overflow-x: auto; color: var(--ink); }
+  .embed .copy { position: absolute; top: 8px; right: 8px; min-height: 36px; font: inherit; font-size: 12px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); cursor: pointer; }
+  .embed p { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+  .steps { margin: 0; padding-left: 1.2em; font-size: 13px; color: var(--muted); }
+  .steps li { margin: 2px 0; }
   footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
   footer a { color: inherit; }
   .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 14px; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; }
@@ -139,6 +160,10 @@
       <div class="actions">
         <button class="btn" id="dims-toggle" aria-pressed="false">寸法を表示</button>
       </div>
+      <div class="drop" id="drop">
+        <label>3Dデータを読み込む<input type="file" id="file" accept=".glb,model/gltf-binary"></label>
+        <span>手持ちの GLB ファイルをここにドロップすると、そのままARで置けます（この端末内だけで処理。アップロードしません）</span>
+      </div>
       <div class="noar" id="noar">
         <div id="qr"></div>
         <p>この端末ではカメラ配置（AR）が使えません。スマホでこのQRを読み取ると、商品ページに「自分の部屋に置いてみる」ボタンが出ます。<br><code id="url"></code><span id="lanhint"></span></p>
@@ -154,6 +179,10 @@
         <div><span>奥行</span><b id="s-d">—<i>cm</i></b></div>
         <div><span>高さ</span><b id="s-h">—<i>cm</i></b></div>
       </div>
+      <div class="colors" id="colors" hidden>
+        <span class="lbl" id="colors-lbl">カラー</span>
+        <div class="chips" id="chips" role="group" aria-labelledby="colors-lbl"></div>
+      </div>
       <button class="btn primary cart" id="cart">カートに入れる</button>
 
       <section class="box">
@@ -163,6 +192,14 @@
           <label for="door-h">高さ</label><input id="door-h" type="number" inputmode="numeric" value="200" min="100" max="300"><span>cm</span>
         </div>
         <p class="verdict" id="verdict"></p>
+      </section>
+
+      <section class="box embed">
+        <h2>導入イメージ<small>商品ページに貼るタグ</small></h2>
+        <pre id="tag">&lt;script src="https://ar.example.jp/embed.js"
+  data-sku="SOFA-001" data-size="219x102x79"&gt;&lt;/script&gt;</pre>
+        <button class="copy" id="copy" type="button">コピー</button>
+        <p>本開発では、管理画面で写真と寸法を登録すると SKU ごとにこのタグが発行され、商品ページに1行貼るだけでボタンが付く想定です。</p>
       </section>
 
       <section class="box">
@@ -186,9 +223,9 @@
 
 <script>
   const PRODUCTS = [
-    { id: 'sofa',  file: 'models/GlamVelvetSofa.glb',        name: 'ベルベットソファ 3人掛け',  price: 89800, blurb: 'アームが低く、ソファベッドとしても使える3人掛け。布物は3D化の難易度が高い代表例です。' },
-    { id: 'chair', file: 'models/SheenChair.glb',            name: 'スリッパーチェア ピーコック', price: 32800, blurb: '肘なしの1人掛け。ベロアの光沢を3Dで再現しています。' },
-    { id: 'arm',   file: 'models/ChairDamaskPurplegold.glb', name: 'ダマスク柄アームチェア',      price: 45800, blurb: '柄物の生地と木脚の組み合わせ。色味の再現度を確認する用途に向きます。' },
+    { id: 'sofa',  sku: 'SOFA-001', file: 'models/GlamVelvetSofa.glb',        name: 'ベルベットソファ 3人掛け',  price: 89800, blurb: 'アームが低く、ソファベッドとしても使える3人掛け。布物は3D化の難易度が高い代表例です。' },
+    { id: 'chair', sku: 'CHAIR-014', file: 'models/SheenChair.glb',            name: 'スリッパーチェア ピーコック', price: 32800, blurb: '肘なしの1人掛け。ベロアの光沢を3Dで再現しています。' },
+    { id: 'arm',   sku: 'ARM-022', file: 'models/ChairDamaskPurplegold.glb', name: 'ダマスク柄アームチェア',      price: 45800, blurb: '柄物の生地と木脚の組み合わせ。色味の再現度を確認する用途に向きます。' },
   ];
   const $ = id => document.getElementById(id);
   const mv = $('mv'), viewer = $('viewer');
@@ -226,6 +263,7 @@
     $('verdict').textContent = '寸法を読み込み中…'; $('verdict').className = 'verdict';
     if (mv.src !== new URL(p.file, location.href).href) mv.src = p.file;
     metrics.view += 1; saveMetrics();
+    if (typeof renderTag === 'function') renderTag();
   }
 
   // ---- 寸法（モデルの実寸から算出） ----
@@ -298,6 +336,54 @@
   $('cart').addEventListener('click', () => { metrics.cart += 1; saveMetrics(); toast(current.name + ' をカートに入れました（デモ）'); });
   let toastTimer;
   function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200); }
+
+
+  // ---- カラーシミュレーション（モデルのバリアント、無ければ生地材質を着色） ----
+  const VNAME = { champagne: 'シャンパン', navy: 'ネイビー', gray: 'グレー', black: 'ブラック', palepink: 'ペールピンク', mango: 'マンゴー', peacock: 'ピーコック', brown: 'ブラウン', beige: 'ベージュ' };
+  const VSWATCH = { champagne: '#d8c9a3', navy: '#1f2a44', gray: '#8a8d88', black: '#1a1a1a', palepink: '#d9a6a8', mango: '#d1461a', peacock: '#0f4d52', brown: '#5a3a1e', beige: '#d9cbb3' };
+  const TINTS = [ { n: 'オリジナル', c: [1, 1, 1], sw: '#b9a4c9' }, { n: 'モスグリーン', c: [.45, .55, .40], sw: '#6e8a62' }, { n: 'インディゴ', c: [.35, .40, .62], sw: '#4a5490' }, { n: 'テラコッタ', c: [.85, .52, .40], sw: '#c47a5a' } ];
+  function jpName(raw) { const k = raw.toLowerCase().replace(/\s+/g, ''); const hit = Object.keys(VNAME).find(w => k.includes(w)); return hit ? VNAME[hit] + (k.includes('wood') ? '（木部）' : '') : raw.replace(/^.*?_/, ''); }
+  function swatchOf(raw) { const k = raw.toLowerCase().replace(/\s+/g, ''); const hit = Object.keys(VSWATCH).find(w => k.includes(w)); return hit ? VSWATCH[hit] : '#999'; }
+  const CHECK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  function chip(label, sw, pressed, onClick) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.setAttribute('aria-pressed', pressed);
+    b.innerHTML = `<i style="--sw:${sw}"></i>${label}${CHECK}`; b.addEventListener('click', onClick); return b;
+  }
+  async function buildColors() {
+    const wrap = $('colors'), chips = $('chips'); chips.innerHTML = '';
+    const variants = mv.availableVariants || [];
+    if (variants.length > 1) {
+      variants.forEach(v => chips.appendChild(chip(jpName(v), swatchOf(v), v === mv.variantName, () => { mv.variantName = v; [...chips.children].forEach(c => c.setAttribute('aria-pressed', c.textContent === jpName(v))); })));
+      wrap.hidden = false; return;
+    }
+    const mat = mv.model?.materials.find(m => /fabric/i.test(m.name));
+    if (mat) {
+      await mat.ensureLoaded();
+      TINTS.forEach((t, i) => chips.appendChild(chip(t.n, t.sw, i === 0, () => { mat.pbrMetallicRoughness.setBaseColorFactor([...t.c, 1]); [...chips.children].forEach(c => c.setAttribute('aria-pressed', c.textContent === t.n)); })));
+      wrap.hidden = false; return;
+    }
+    wrap.hidden = true;
+  }
+  mv.addEventListener('load', buildColors);
+
+  // ---- 手持ちの3Dデータ（GLB）を読み込む ----
+  const drop = $('drop');
+  function loadFile(f) {
+    if (!f || !/\.glb$/i.test(f.name)) { toast('GLB形式のファイルを選んでください'); return; }
+    current = { id: 'own', sku: 'YOUR-SKU', name: f.name.replace(/\.glb$/i, ''), price: 0, blurb: 'お持ちの3Dデータです。寸法はファイルから読み取っています。' };
+    [...thumbs.children].forEach(b => b.setAttribute('aria-pressed', 'false'));
+    $('p-name').textContent = current.name; $('p-price').textContent = '—'; $('p-blurb').textContent = current.blurb;
+    mv.src = URL.createObjectURL(f); metrics.view += 1; saveMetrics();
+  }
+  $('file').addEventListener('change', e => loadFile(e.target.files[0]));
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => loadFile(e.dataTransfer.files[0]));
+
+  // ---- 導入タグ ----
+  function renderTag() { const d = dims ? `${Math.round(dims.w)}x${Math.round(dims.d)}x${Math.round(dims.h)}` : '—'; $('tag').textContent = `<script src="https://ar.example.jp/embed.js"\n  data-sku="${current.sku}" data-size="${d}"><\/script>`; }
+  mv.addEventListener('load', renderTag);
+  $('copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('tag').textContent); toast('タグをコピーしました'); } catch (e) { const r = document.createRange(); r.selectNodeContents($('tag')); getSelection().removeAllRanges(); getSelection().addRange(r); } });
 
   select(PRODUCTS[0]);
   renderMetrics();
