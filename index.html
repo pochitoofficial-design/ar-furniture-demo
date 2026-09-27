@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>部屋に置いてみる デモ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --bg: #f2f3f0;
+    --surface: #ffffff;
+    --surface-2: #e9ebe6;
+    --ink: #1b201d;
+    --muted: #66706a;
+    --line: #d5d9d3;
+    --accent: #1f5a3e;
+    --accent-ink: #ffffff;
+    --accent-soft: #dfeee5;
+    --good: #1f7a4a;
+    --bad: #b23a2e;
+    --warn: #9a6b00;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans: "Zen Kaku Gothic New", "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141816; --surface: #1d2320; --surface-2: #262d29; --ink: #e9ece8; --muted: #9aa49e;
+      --line: #343c37; --accent: #6fbf95; --accent-ink: #0f1a14; --accent-soft: #223a2e;
+      --good: #6fbf95; --bad: #e08a80; --warn: #d9b25a; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141816; --surface: #1d2320; --surface-2: #262d29; --ink: #e9ece8; --muted: #9aa49e;
+    --line: #343c37; --accent: #6fbf95; --accent-ink: #0f1a14; --accent-soft: #223a2e;
+    --good: #6fbf95; --bad: #e08a80; --warn: #d9b25a; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; }
+  body { padding-inline: 16px; padding-block: env(safe-area-inset-top, 0px) 48px; }
+  .wrap { max-width: 1040px; margin: 0 auto; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 14px 10px; border-bottom: 1px solid var(--line); }
+  .brand { font-weight: 700; letter-spacing: .02em; }
+  .brand small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+  .pill { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; padding: 3px 9px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); white-space: nowrap; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 20px; padding-top: 18px; }
+  @media (min-width: 900px) { .grid { grid-template-columns: 1.15fr .85fr; gap: 32px; } .viewer-col { position: sticky; top: 12px; align-self: start; } }
+  .thumbs { display: flex; gap: 8px; margin-bottom: 10px; }
+  .thumbs button { flex: 1; font: inherit; font-size: 13px; padding: 8px 6px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); cursor: pointer; }
+  .thumbs button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+  .thumbs button:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .viewer { position: relative; width: 100%; aspect-ratio: 4 / 3; max-width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  model-viewer { width: 100%; height: 100%; --poster-color: transparent; --progress-bar-color: var(--accent); --min-hotspot-opacity: 1; }
+  .viewer svg.dims { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .viewer svg.dims line { stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 4 3; }
+  .viewer[data-dims="off"] .dot, .viewer[data-dims="off"] .dim, .viewer[data-dims="off"] svg.dims { display: none; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); border: 0; padding: 0; }
+  .dim { font: 500 12px var(--mono); background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 6px; padding: 2px 6px; white-space: nowrap; }
+  .hint { position: absolute; left: 10px; bottom: 10px; font-size: 11px; color: var(--muted); background: color-mix(in srgb, var(--surface) 80%, transparent); padding: 3px 8px; border-radius: 6px; pointer-events: none; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  .btn { font: inherit; font-weight: 700; padding: 12px 18px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); flex: 1 1 220px; }
+  .btn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+  .noar { display: none; margin-top: 12px; gap: 14px; align-items: center; padding: 12px; border: 1px dashed var(--line); border-radius: 10px; background: var(--surface); }
+  .noar.show { display: flex; }
+  .noar #qr { flex: 0 0 auto; background: #fff; padding: 6px; border-radius: 6px; }
+  .noar #qr img, .noar #qr canvas { display: block; }
+  .noar p { margin: 0; font-size: 13px; color: var(--muted); }
+  .noar code { font-family: var(--mono); font-size: 12px; color: var(--ink); word-break: break-all; }
+  .info h1 { font-size: 22px; line-height: 1.35; margin: 0 0 4px; text-wrap: balance; }
+  .price { font-family: var(--mono); font-size: 22px; font-weight: 500; margin: 0 0 6px; font-variant-numeric: tabular-nums; }
+  .price small { font-size: 12px; color: var(--muted); font-family: var(--sans); margin-left: 6px; }
+  .blurb { color: var(--muted); margin: 0 0 14px; font-size: 14px; }
+  .spec { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .spec div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .spec span { display: block; font-size: 11px; color: var(--muted); letter-spacing: .06em; }
+  .spec b { font-family: var(--mono); font-weight: 500; font-size: 18px; font-variant-numeric: tabular-nums; }
+  .spec b i { font-style: normal; font-size: 11px; color: var(--muted); margin-left: 2px; }
+  .cart { width: 100%; }
+  section.box { margin-top: 20px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+  section.box h2 { font-size: 14px; margin: 0 0 8px; letter-spacing: .04em; }
+  section.box h2 small { font-weight: 400; color: var(--muted); margin-left: 8px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .row label { font-size: 13px; color: var(--muted); }
+  .row input { font: 500 16px var(--mono); width: 90px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
+  .verdict { margin: 10px 0 0; font-size: 14px; padding: 8px 12px; border-radius: 8px; background: var(--surface-2); }
+  .verdict.ok { color: var(--good); } .verdict.ng { color: var(--bad); }
+  .verdict b { font-family: var(--mono); font-weight: 500; }
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .metrics div { text-align: center; padding: 8px 4px; border-radius: 8px; background: var(--surface-2); }
+  .metrics span { display: block; font-size: 11px; color: var(--muted); }
+  .metrics b { font-family: var(--mono); font-weight: 500; font-size: 20px; font-variant-numeric: tabular-nums; }
+  .metrics em { display: block; font-style: normal; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .metrics-note { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; color: var(--muted); }
+  .metrics-note button { font: inherit; font-size: 12px; background: none; border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; color: var(--muted); cursor: pointer; }
+  footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+  footer a { color: inherit; }
+  .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 14px; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">デモストア<small>架空の家具EC・商品ページの試作</small></div>
+    <span class="pill">Demo</span>
+  </header>
+
+  <div class="grid">
+    <div class="viewer-col">
+      <div class="thumbs" id="thumbs" role="tablist" aria-label="商品を選ぶ"></div>
+      <div class="viewer" id="viewer" data-dims="off">
+        <model-viewer id="mv"
+          src="models/GlamVelvetSofa.glb"
+          alt="家具の3Dモデル"
+          ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" ar-placement="floor"
+          camera-controls touch-action="pan-y"
+          shadow-intensity="1" environment-image="neutral" exposure="1"
+          interaction-prompt="none" loading="eager">
+          <button class="dot" slot="hotspot-c1" data-position="0 0 0" aria-hidden="true"></button>
+          <button class="dot" slot="hotspot-c2" data-position="0 0 0" aria-hidden="true"></button>
+          <button class="dot" slot="hotspot-c3" data-position="0 0 0" aria-hidden="true"></button>
+          <button class="dot" slot="hotspot-c4" data-position="0 0 0" aria-hidden="true"></button>
+          <button class="dim" slot="hotspot-w" data-position="0 0 0" id="dim-w">幅</button>
+          <button class="dim" slot="hotspot-d" data-position="0 0 0" id="dim-d">奥行</button>
+          <button class="dim" slot="hotspot-h" data-position="0 0 0" id="dim-h">高さ</button>
+          <button class="btn primary" slot="ar-button" id="ar-btn">自分の部屋に置いてみる</button>
+        </model-viewer>
+        <svg class="dims" id="dims" aria-hidden="true">
+          <line id="l-w"></line><line id="l-d"></line><line id="l-h"></line>
+        </svg>
+        <div class="hint">ドラッグで回転・ピンチで拡大</div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="dims-toggle" aria-pressed="false">寸法を表示</button>
+      </div>
+      <div class="noar" id="noar">
+        <div id="qr"></div>
+        <p>この端末ではカメラ配置（AR）が使えません。スマホでこのQRを読み取ると、商品ページに「自分の部屋に置いてみる」ボタンが出ます。<br><code id="url"></code><span id="lanhint"></span></p>
+      </div>
+    </div>
+
+    <div class="info">
+      <h1 id="p-name"></h1>
+      <p class="price"><span id="p-price"></span><small>税込・デモ用の架空価格</small></p>
+      <p class="blurb" id="p-blurb"></p>
+      <div class="spec">
+        <div><span>幅</span><b id="s-w">—<i>cm</i></b></div>
+        <div><span>奥行</span><b id="s-d">—<i>cm</i></b></div>
+        <div><span>高さ</span><b id="s-h">—<i>cm</i></b></div>
+      </div>
+      <button class="btn primary cart" id="cart">カートに入れる</button>
+
+      <section class="box">
+        <h2>搬入チェック<small>玄関・廊下を通るか</small></h2>
+        <div class="row">
+          <label for="door-w">通路の幅</label><input id="door-w" type="number" inputmode="numeric" value="75" min="30" max="300"><span>cm</span>
+          <label for="door-h">高さ</label><input id="door-h" type="number" inputmode="numeric" value="200" min="100" max="300"><span>cm</span>
+        </div>
+        <p class="verdict" id="verdict"></p>
+      </section>
+
+      <section class="box">
+        <h2>効果測定<small>この端末での操作を数えています</small></h2>
+        <div class="metrics">
+          <div><span>ページ表示</span><b id="m-view">0</b><em>&nbsp;</em></div>
+          <div><span>3D操作</span><b id="m-interact">0</b><em id="r-interact">—</em></div>
+          <div><span>AR起動</span><b id="m-ar">0</b><em id="r-ar">—</em></div>
+          <div><span>カート投入</span><b id="m-cart">0</b><em id="r-cart">—</em></div>
+        </div>
+        <div class="metrics-note"><span>本番では「ARを押した人」と「押さなかった人」の購入率を比べます。</span><button id="m-reset">リセット</button></div>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    3Dモデルは <a href="https://github.com/KhronosGroup/glTF-Sample-Assets" target="_blank" rel="noopener">Khronos glTF Sample Assets</a>（Wayfair 提供、CC BY 4.0）。商品名・価格は架空です。表示は Google の model-viewer を使用。
+  </footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  const PRODUCTS = [
+    { id: 'sofa',  file: 'models/GlamVelvetSofa.glb',        name: 'ベルベットソファ 3人掛け',  price: 89800, blurb: 'アームが低く、ソファベッドとしても使える3人掛け。布物は3D化の難易度が高い代表例です。' },
+    { id: 'chair', file: 'models/SheenChair.glb',            name: 'スリッパーチェア ピーコック', price: 32800, blurb: '肘なしの1人掛け。ベロアの光沢を3Dで再現しています。' },
+    { id: 'arm',   file: 'models/ChairDamaskPurplegold.glb', name: 'ダマスク柄アームチェア',      price: 45800, blurb: '柄物の生地と木脚の組み合わせ。色味の再現度を確認する用途に向きます。' },
+  ];
+  const $ = id => document.getElementById(id);
+  const mv = $('mv'), viewer = $('viewer');
+  let current = PRODUCTS[0], dims = null, interacted = false;
+
+  // ---- 効果測定（デモ用。localStorageに端末内だけで保存） ----
+  const M_KEY = 'ardemo-metrics';
+  let metrics = { view: 0, interact: 0, ar: 0, cart: 0 };
+  try { metrics = Object.assign(metrics, JSON.parse(localStorage.getItem(M_KEY) || '{}')); } catch (e) {}
+  function saveMetrics() { try { localStorage.setItem(M_KEY, JSON.stringify(metrics)); } catch (e) {} renderMetrics(); }
+  function pct(n, d) { return d ? Math.round(n / d * 100) + '%' : '—'; }
+  function renderMetrics() {
+    $('m-view').textContent = metrics.view; $('m-interact').textContent = metrics.interact;
+    $('m-ar').textContent = metrics.ar; $('m-cart').textContent = metrics.cart;
+    $('r-interact').textContent = pct(metrics.interact, metrics.view);
+    $('r-ar').textContent = pct(metrics.ar, metrics.view);
+    $('r-cart').textContent = pct(metrics.cart, metrics.view);
+  }
+  $('m-reset').addEventListener('click', () => { metrics = { view: 0, interact: 0, ar: 0, cart: 0 }; saveMetrics(); });
+
+  // ---- 商品切り替え ----
+  const thumbs = $('thumbs');
+  PRODUCTS.forEach(p => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.role = 'tab'; b.textContent = p.name.split(' ')[0]; b.dataset.id = p.id;
+    b.addEventListener('click', () => select(p));
+    thumbs.appendChild(b);
+  });
+  function fmtYen(n) { return '¥' + n.toLocaleString('ja-JP'); }
+  function select(p) {
+    current = p; dims = null; interacted = false;
+    [...thumbs.children].forEach(b => b.setAttribute('aria-pressed', b.dataset.id === p.id));
+    $('p-name').textContent = p.name; $('p-price').textContent = fmtYen(p.price); $('p-blurb').textContent = p.blurb;
+    ['s-w', 's-d', 's-h'].forEach(id => $(id).innerHTML = '—<i>cm</i>');
+    $('verdict').textContent = '寸法を読み込み中…'; $('verdict').className = 'verdict';
+    if (mv.src !== new URL(p.file, location.href).href) mv.src = p.file;
+    metrics.view += 1; saveMetrics();
+  }
+
+  // ---- 寸法（モデルの実寸から算出） ----
+  mv.addEventListener('load', () => {
+    const s = mv.getDimensions(), c = mv.getBoundingBoxCenter();
+    dims = { w: s.x * 100, d: s.z * 100, h: s.y * 100 };
+    const r = v => Math.round(v);
+    $('s-w').innerHTML = r(dims.w) + '<i>cm</i>'; $('s-d').innerHTML = r(dims.d) + '<i>cm</i>'; $('s-h').innerHTML = r(dims.h) + '<i>cm</i>';
+    $('dim-w').textContent = '幅 ' + r(dims.w) + ' cm'; $('dim-d').textContent = '奥行 ' + r(dims.d) + ' cm'; $('dim-h').textContent = '高さ ' + r(dims.h) + ' cm';
+    const x = s.x / 2, y = s.y / 2, z = s.z / 2;
+    const P = (dx, dy, dz) => `${c.x + dx} ${c.y + dy} ${c.z + dz}`;
+    mv.updateHotspot({ name: 'hotspot-c1', position: P(+x, -y, +z) });   // 手前右下
+    mv.updateHotspot({ name: 'hotspot-c2', position: P(-x, -y, +z) });   // 手前左下
+    mv.updateHotspot({ name: 'hotspot-c3', position: P(+x, -y, -z) });   // 奥右下
+    mv.updateHotspot({ name: 'hotspot-c4', position: P(+x, +y, -z) });   // 奥右上
+    mv.updateHotspot({ name: 'hotspot-w', position: P(0, -y - 0.04, +z + 0.04) });
+    mv.updateHotspot({ name: 'hotspot-d', position: P(+x + 0.04, -y - 0.04, 0) });
+    mv.updateHotspot({ name: 'hotspot-h', position: P(+x + 0.04, 0, -z - 0.04) });
+    drawLines(); checkDoor();
+  });
+  function drawLines() {
+    if (viewer.dataset.dims === 'off') return;
+    const q = n => mv.queryHotspot(n)?.canvasPosition;
+    const set = (id, a, b) => { const A = q(a), B = q(b), l = $(id); if (!A || !B) return; l.setAttribute('x1', A.x); l.setAttribute('y1', A.y); l.setAttribute('x2', B.x); l.setAttribute('y2', B.y); };
+    set('l-w', 'hotspot-c1', 'hotspot-c2'); set('l-d', 'hotspot-c1', 'hotspot-c3'); set('l-h', 'hotspot-c3', 'hotspot-c4');
+  }
+  mv.addEventListener('camera-change', e => {
+    requestAnimationFrame(drawLines);
+    if (e.detail?.source === 'user-interaction' && !interacted) { interacted = true; metrics.interact += 1; saveMetrics(); }
+  });
+  $('dims-toggle').addEventListener('click', () => {
+    const on = viewer.dataset.dims === 'off';
+    viewer.dataset.dims = on ? 'on' : 'off';
+    $('dims-toggle').setAttribute('aria-pressed', on); $('dims-toggle').textContent = on ? '寸法を隠す' : '寸法を表示';
+    if (on) drawLines();
+  });
+
+  // ---- AR ----
+  mv.addEventListener('ar-status', e => {
+    if (e.detail.status === 'session-started') { metrics.ar += 1; saveMetrics(); }
+    if (e.detail.status === 'failed') toast('この端末ではARを開始できませんでした');
+  });
+  function setupNoAr() {
+    const can = mv.canActivateAR;
+    $('noar').classList.toggle('show', !can);
+    if (can) return;
+    const url = location.href.split('#')[0];
+    $('url').textContent = url;
+    const local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+    $('lanhint').textContent = local ? '（localhost のままだとスマホから開けません。Mac の LAN アドレスで開き直してください）' : '';
+    if (window.QRCode && !$('qr').hasChildNodes()) new QRCode($('qr'), { text: url, width: 112, height: 112, colorDark: '#1b201d', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+  }
+  customElements.whenDefined('model-viewer').then(() => setTimeout(setupNoAr, 300));
+
+  // ---- 搬入チェック ----
+  function checkDoor() {
+    const v = $('verdict');
+    if (!dims) return;
+    const w = +$('door-w').value || 0, h = +$('door-h').value || 0;
+    const sorted = [dims.w, dims.d, dims.h].sort((a, b) => a - b);
+    const a = sorted[0], b = sorted[1];
+    const r = x => Math.round(x);
+    if (a <= w && b <= h) { v.className = 'verdict ok'; v.innerHTML = `通ります。いちばん薄い面が <b>${r(a)}×${r(b)} cm</b> なので、幅 ${w} cm の通路に <b>${r(w - a)} cm</b> の余裕があります。`; }
+    else if (a <= h && b <= w) { v.className = 'verdict ok'; v.innerHTML = `横にすれば通ります。薄い面は <b>${r(a)}×${r(b)} cm</b> です。`; }
+    else { v.className = 'verdict ng'; v.innerHTML = `通りません。いちばん薄い面でも <b>${r(a)}×${r(b)} cm</b> あり、幅 ${w} cm の通路には <b>${r(a - w)} cm</b> 足りません。分解できるかご確認ください。`; }
+  }
+  $('door-w').addEventListener('input', checkDoor); $('door-h').addEventListener('input', checkDoor);
+
+  // ---- カート ----
+  $('cart').addEventListener('click', () => { metrics.cart += 1; saveMetrics(); toast(current.name + ' をカートに入れました（デモ）'); });
+  let toastTimer;
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200); }
+
+  select(PRODUCTS[0]);
+  renderMetrics();
+</script>
+</body>
+</html>
