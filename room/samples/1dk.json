@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "unit": "cm",
+  "source": "1DK 29.49㎡ の間取り図（Claude が画像から読み取り、専有面積で寸法を補正）",
+  "totalAreaM2": 29.49,
+  "ceilingHeight": 240,
+  "image": "plans/1dk.jpg",
+  "imageRect": { "x": -73, "y": -6, "w": 920, "d": 393 },
+  "rooms": [
+    { "id": "mb",       "name": "MB",           "type": "storage",  "x": 0,   "y": 0,   "w": 80,  "d": 100 },
+    { "id": "sb",       "name": "SB",           "type": "storage",  "x": 0,   "y": 100, "w": 80,  "d": 60 },
+    { "id": "wc",       "name": "トイレ",        "type": "toilet",   "x": 85,  "y": 0,   "w": 120, "d": 120 },
+    { "id": "entrance", "name": "玄関",          "type": "entrance", "x": 0,   "y": 120, "w": 110, "d": 100 },
+    { "id": "hall",     "name": "廊下",          "type": "corridor", "x": 110, "y": 120, "w": 270, "d": 100 },
+    { "id": "wash",     "name": "洗面所",        "type": "washroom", "x": 0,   "y": 220, "w": 210, "d": 150 },
+    { "id": "bath",     "name": "浴室",          "type": "bath",     "x": 210, "y": 220, "w": 100, "d": 150 },
+    { "id": "kitchen",  "name": "キッチン",      "type": "kitchen",  "x": 205, "y": 0,   "w": 175, "d": 120 },
+    { "id": "dk",       "name": "DK",           "type": "living",   "x": 380, "y": 0,   "w": 290, "d": 215, "jo": 7.2 },
+    { "id": "fridge",   "name": "冷蔵庫置場",    "type": "storage",  "x": 310, "y": 215, "w": 70,  "d": 70 },
+    { "id": "work",     "name": "ワークスペース", "type": "other",    "x": 380, "y": 215, "w": 70,  "d": 70 },
+    { "id": "closet",   "name": "収納",          "type": "storage",  "x": 310, "y": 285, "w": 70,  "d": 85 },
+    { "id": "wic",      "name": "WIC",          "type": "storage",  "x": 380, "y": 285, "w": 80,  "d": 85 },
+    { "id": "bed",      "name": "洋室",          "type": "bedroom",  "x": 460, "y": 215, "w": 210, "d": 155, "jo": 3 },
+    { "id": "balcony",  "name": "バルコニー",    "type": "balcony",  "x": 705, "y": 0,   "w": 95,  "d": 370 }
+  ],
+  "doors": [
+    { "room": "entrance", "wall": "left",   "offset": 10, "width": 80,  "type": "hinged",  "note": "玄関ドア" },
+    { "room": "entrance", "wall": "right",  "offset": 10, "width": 80,  "type": "open" },
+    { "room": "wc",       "wall": "bottom", "offset": 25, "width": 65,  "type": "hinged" },
+    { "room": "wash",     "wall": "top",    "offset": 60, "width": 70,  "type": "hinged" },
+    { "room": "bath",     "wall": "left",   "offset": 40, "width": 65,  "type": "hinged" },
+    { "room": "kitchen",  "wall": "bottom", "offset": 0,  "width": 175, "type": "open" },
+    { "room": "kitchen",  "wall": "right",  "offset": 0,  "width": 120, "type": "open" },
+    { "room": "hall",     "wall": "right",  "offset": 0,  "width": 100, "type": "open" },
+    { "room": "fridge",   "wall": "top",    "offset": 0,  "width": 70,  "type": "open" },
+    { "room": "work",     "wall": "top",    "offset": 0,  "width": 70,  "type": "open" },
+    { "room": "bed",      "wall": "top",    "offset": 20, "width": 170, "type": "sliding" },
+    { "room": "wic",      "wall": "right",  "offset": 8,  "width": 65,  "type": "hinged" },
+    { "room": "closet",   "wall": "right",  "offset": 8,  "width": 60,  "type": "hinged" },
+    { "room": "dk",       "wall": "right",  "offset": 20, "width": 175, "type": "sliding", "note": "バルコニーへの掃き出し窓" },
+    { "room": "bed",      "wall": "right",  "offset": 15, "width": 125, "type": "sliding", "note": "バルコニーへの掃き出し窓" }
+  ],
+  "windows": [],
+  "fixtures": [
+    { "type": "kitchen", "room": "kitchen", "x": 205, "y": 0,   "w": 175, "d": 60 },
+    { "type": "bathtub", "room": "bath",    "x": 215, "y": 225, "w": 90,  "d": 140 },
+    { "type": "toilet",  "room": "wc",      "x": 120, "y": 25,  "w": 50,  "d": 70 },
+    { "type": "sink",    "room": "wash",    "x": 20,  "y": 310, "w": 80,  "d": 50 }
+  ]
+}
