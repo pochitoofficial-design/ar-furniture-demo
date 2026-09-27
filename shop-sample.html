@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>導入イメージ：商品ページ</title>
+<style>body{font-family:system-ui,"Hiragino Sans",sans-serif;margin:0;color:#1c1c1c;background:#fff}.wrap{max-width:720px;margin:0 auto;padding:16px}h1{font-size:20px;margin:16px 0 4px}.price{font-size:22px;font-weight:700;margin:0 0 12px}.cart{display:block;width:100%;padding:14px;border:0;border-radius:8px;background:#1c1c1c;color:#fff;font:700 15px system-ui;margin:16px 0}p{color:#555;font-size:14px;line-height:1.7}.tag{background:#f3f0eb;border-radius:8px;padding:12px;font:12px ui-monospace,Menlo,monospace;overflow-x:auto;white-space:pre}</style></head>
+<body><div class="wrap">
+<h1>ベルベットソファ 3人掛け</h1><p class="price">¥89,800</p>
+<p>これは顧客の商品ページを模したサンプルです。下の3Dビューとボタンは、次の1行だけで表示されています。</p>
+<div class="tag">&lt;script src="https://pochitoofficial-design.github.io/ar-furniture-demo/embed.js" data-sku="SOFA-001"&gt;&lt;/script&gt;</div>
+<script src="embed.js" data-sku="SOFA-001"></script>
+<button class="cart" onclick="(window.dataLayer=window.dataLayer||[]).push({event:'add_to_cart',sku:'SOFA-001'});this.textContent='カートに入れました（サンプル）'">カートに入れる</button>
+<p>計測イベントは <code>window.dataLayer</code> に <code>roomfit_ar</code>（action: shown / start / fail / variant）として入ります。GA4 のタグマネージャーでそのまま拾えます。</p>
+<script>window.dataLayer=window.dataLayer||[];document.addEventListener('roomfit:ar',function(e){console.log('[sample] roomfit event',e.detail)});</script>
+</div></body></html>

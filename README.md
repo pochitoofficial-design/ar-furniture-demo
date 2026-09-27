@@ -5,9 +5,33 @@
 - 家具ARモード: https://pochitoofficial-design.github.io/ar-furniture-demo/
 - 物件モード（図面 → 3D模型 → カメラ内覧 → 家具配置）: https://pochitoofficial-design.github.io/ar-furniture-demo/room/
 
+## 最初のリリース（MVP）
+
+範囲は `docs/MVP.md`。提供するのは次の 5 点。
+
+| 部品 | 場所 | 役割 |
+|---|---|---|
+| 埋め込みタグ | `embed.js` | 商品ページに 1 行貼ると AR ボタンと 3D ビューが付く。`dataLayer` / `gtag` に計測イベントを送る |
+| カタログ | `catalog.json` | SKU ごとのモデルと寸法 |
+| 導入サンプル | `shop-sample.html` | 顧客の商品ページに貼った状態の見本 |
+| モデル準備ツール | `tools/prepare.html` | GLB を実寸に合わせて床に接地させ、配信用 GLB とカタログ JSON を書き出す |
+| 生成パイプライン | `pipeline/generate.py` | 商品写真から Meshy API で GLB / USDZ を生成（`MESHY_API_KEY` が必要。実 API での動作確認は未実施） |
+
+顧客側の作業は、商品ページに次を貼るだけ。
+
+```html
+<script src="https://pochitoofficial-design.github.io/ar-furniture-demo/embed.js" data-sku="SOFA-001"></script>
+```
+
 ## 構成
 
 ```
+embed.js            埋め込みタグ本体
+catalog.json        SKU カタログ
+shop-sample.html    導入サンプル
+tools/prepare.html  モデル準備ツール
+pipeline/generate.py 写真 → 3D 生成（Meshy）
+docs/MVP.md         最初のリリースの範囲
 index.html          家具ARモード（model-viewer。商品ページの試作）
 models/*.glb        家具の3Dモデル（Khronos glTF Sample Assets、Wayfair提供、CC BY 4.0）
 room/index.html     物件モード（three.js 0.160 + model-viewer 4.3）

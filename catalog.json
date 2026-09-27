@@ -1,0 +1,5 @@
+{
+  "SOFA-001": { "name": "ベルベットソファ 3人掛け", "glb": "models/GlamVelvetSofa.glb", "usdz": null, "size": { "w": 219, "d": 102, "h": 79 }, "variants": { "Champagne": "シャンパン", "Navy": "ネイビー", "Gray": "グレー", "Black": "ブラック", "Pale Pink": "ペールピンク" } },
+  "CHAIR-014": { "name": "スリッパーチェア ピーコック", "glb": "models/SheenChair.glb", "usdz": null, "size": { "w": 83, "d": 57, "h": 69 }, "variants": {} },
+  "ARM-022": { "name": "ダマスク柄アームチェア", "glb": "models/ChairDamaskPurplegold.glb", "usdz": null, "size": { "w": 68, "d": 70, "h": 92 }, "variants": {} }
+}

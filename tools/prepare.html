@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>モデル準備ツール</title>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
+<style>
+  body{font-family:system-ui,"Hiragino Sans",sans-serif;margin:0;background:#f3f4f2;color:#1b201d}.wrap{max-width:960px;margin:0 auto;padding:16px}
+  h1{font-size:18px;margin:8px 0 4px}.lead{color:#66706a;font-size:13px;margin:0 0 14px}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}@media(min-width:800px){.grid{grid-template-columns:1.1fr .9fr}}
+  .stage{position:relative;aspect-ratio:4/3;background:#fff;border:1px solid #d5d9d3;border-radius:10px;overflow:hidden}.stage canvas{display:block;width:100%;height:100%}
+  .drop{border:2px dashed #b9bfb9;border-radius:10px;padding:18px;text-align:center;background:#fff;position:relative;font-size:14px}.drop input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}.drop.over{border-color:#1f5a3e;background:#dfeee5}
+  .card{background:#fff;border:1px solid #d5d9d3;border-radius:10px;padding:14px;margin-top:12px}.card h2{font-size:14px;margin:0 0 8px}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0}label{font-size:13px;color:#66706a}input[type=number],input[type=text]{font:500 15px ui-monospace,Menlo,monospace;width:90px;padding:8px;border:1px solid #d5d9d3;border-radius:6px}input[type=text]{width:160px;font-family:system-ui}
+  .btn{font:700 14px system-ui;min-height:42px;padding:0 16px;border:1px solid #1b201d;border-radius:8px;background:#fff;cursor:pointer}.btn.primary{background:#1f5a3e;color:#fff;border-color:#1f5a3e}.btn.sm{min-height:34px;font-weight:500;font-size:13px}
+  .stat{font:13px ui-monospace,Menlo,monospace;color:#66706a}.stat b{color:#1b201d;font-weight:500}
+  pre{background:#e9ebe6;border-radius:8px;padding:10px;font:12px ui-monospace,Menlo,monospace;overflow-x:auto;white-space:pre-wrap}
+  .steps{font-size:13px;color:#66706a;padding-left:1.2em;margin:0}.steps li{margin:3px 0}
+</style></head>
+<body><div class="wrap">
+<h1>モデル準備ツール</h1>
+<p class="lead">外注やAI生成で得たGLBを読み込み、実寸に合わせて床に接地させ、配信用のGLBとカタログ用JSONを書き出します。ブラウザ内だけで処理し、どこにも送りません。</p>
+<div class="grid">
+  <div>
+    <div class="drop" id="drop">GLBファイルをここにドロップ、またはクリックして選択<input type="file" id="file" accept=".glb,model/gltf-binary"></div>
+    <div class="stage" id="stage" style="margin-top:12px"><canvas id="c"></canvas></div>
+    <div class="row stat" id="stat">まだ読み込んでいません</div>
+  </div>
+  <div>
+    <div class="card"><h2>1. 実寸を入力（cm）</h2>
+      <div class="row"><label>幅</label><input type="number" id="w" placeholder="219"><label>奥行</label><input type="number" id="d" placeholder="102"><label>高さ</label><input type="number" id="h" placeholder="79"></div>
+      <div class="row"><button class="btn sm" id="fit-w">幅に合わせて拡大縮小</button><button class="btn sm" id="fit-h">高さに合わせる</button><button class="btn sm" id="rot">向きを90°回す</button><button class="btn sm" id="floor">床に接地・中央寄せ</button></div>
+      <p class="stat" style="margin:6px 0 0">正面が +Z（手前）、上が +Y になるように回してください。ARでは幅がそのまま部屋に出ます。</p>
+    </div>
+    <div class="card"><h2>2. カタログ情報</h2>
+      <div class="row"><label>SKU</label><input type="text" id="sku" placeholder="SOFA-001"><label>商品名</label><input type="text" id="name" placeholder="ベルベットソファ 3人掛け"></div>
+      <div class="row"><label>ファイル名</label><input type="text" id="fname" placeholder="sofa-001.glb"></div>
+    </div>
+    <div class="card"><h2>3. 書き出し</h2>
+      <div class="row"><button class="btn primary" id="export" disabled>正規化したGLBを保存</button><button class="btn sm" id="copy" disabled>カタログJSONをコピー</button></div>
+      <pre id="json">{ }</pre>
+      <ol class="steps"><li>保存したGLBを <code>models/</code> に置く</li><li>JSONを <code>catalog.json</code> に追記する</li><li>商品ページに <code>embed.js</code> のタグを貼る</li></ol>
+    </div>
+  </div>
+</div></div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+const $ = id => document.getElementById(id);
+const canvas = $('c'); const renderer = new THREE.WebGLRenderer({ canvas, antialias: true }); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0xffffff); const camera = new THREE.PerspectiveCamera(45, 4 / 3, 0.01, 100); camera.position.set(2.5, 1.6, 3); const controls = new OrbitControls(camera, canvas); controls.enableDamping = true;
+scene.add(new THREE.HemisphereLight(0xffffff, 0xcfd6cc, 1.2)); const sun = new THREE.DirectionalLight(0xffffff, 1.2); sun.position.set(3, 6, 4); scene.add(sun);
+const grid = new THREE.GridHelper(4, 40, 0x1f5a3e, 0xdfe3dd); scene.add(grid); const axes = new THREE.AxesHelper(0.5); scene.add(axes);
+let model = null, boxHelper = null, fileName = 'model.glb';
+function size() { const W = canvas.clientWidth, H = canvas.clientHeight; renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix(); }
+new ResizeObserver(size).observe($('stage')); size();
+(function loop() { requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); })();
+function measure() { if (!model) return null; const b = new THREE.Box3().setFromObject(model); const s = new THREE.Vector3(); b.getSize(s); return { b, w: s.x * 100, h: s.y * 100, d: s.z * 100 }; }
+function refresh() { const m = measure(); if (!m) return; if (boxHelper) scene.remove(boxHelper); boxHelper = new THREE.Box3Helper(m.b, 0x1f5a3e); scene.add(boxHelper);
+  $('stat').innerHTML = `現在の寸法 幅 <b>${m.w.toFixed(1)}</b> × 奥行 <b>${m.d.toFixed(1)}</b> × 高さ <b>${m.h.toFixed(1)}</b> cm　床からの高さ <b>${(m.b.min.y * 100).toFixed(1)}</b> cm`;
+  const sku = $('sku').value || 'SKU', json = { [sku]: { name: $('name').value || '', glb: 'models/' + ($('fname').value || fileName), usdz: null, size: { w: Math.round(m.w), d: Math.round(m.d), h: Math.round(m.h) }, variants: {} } };
+  $('json').textContent = JSON.stringify(json, null, 2).replace(/^\{\n|\n\}$/g, '') + ','; $('export').disabled = $('copy').disabled = false; }
+function load(f) { fileName = f.name.replace(/\.glb$/i, '') + '.glb'; $('fname').value = fileName; new GLTFLoader().load(URL.createObjectURL(f), g => { if (model) scene.remove(model); model = g.scene; scene.add(model); floorCenter(); const m = measure(); const far = Math.max(m.w, m.h, m.d) / 100; camera.position.set(far * 1.6, far * 1.1, far * 2); controls.target.set(0, m.h / 200, 0); refresh(); }, undefined, () => alert('GLBを読み込めませんでした')); }
+function floorCenter() { if (!model) return; const b = new THREE.Box3().setFromObject(model); const c = new THREE.Vector3(); b.getCenter(c); model.position.x -= c.x; model.position.z -= c.z; model.position.y -= b.min.y; model.updateMatrixWorld(true); }
+$('file').addEventListener('change', e => e.target.files[0] && load(e.target.files[0]));
+['dragenter', 'dragover'].forEach(ev => $('drop').addEventListener(ev, e => { e.preventDefault(); $('drop').classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => $('drop').addEventListener(ev, e => { e.preventDefault(); $('drop').classList.remove('over'); }));
+$('drop').addEventListener('drop', e => e.dataTransfer.files[0] && load(e.dataTransfer.files[0]));
+$('fit-w').addEventListener('click', () => { const m = measure(), t = +$('w').value; if (!m || !t) return alert('幅を入力してください'); model.scale.multiplyScalar(t / m.w); floorCenter(); refresh(); });
+$('fit-h').addEventListener('click', () => { const m = measure(), t = +$('h').value; if (!m || !t) return alert('高さを入力してください'); model.scale.multiplyScalar(t / m.h); floorCenter(); refresh(); });
+$('rot').addEventListener('click', () => { if (!model) return; model.rotation.y += Math.PI / 2; model.updateMatrixWorld(true); floorCenter(); refresh(); });
+$('floor').addEventListener('click', () => { floorCenter(); refresh(); });
+['sku', 'name', 'fname'].forEach(id => $(id).addEventListener('input', refresh));
+$('export').addEventListener('click', () => { if (!model) return; const g = new THREE.Group(); const m = model.clone(true); g.add(m); g.updateMatrixWorld(true);
+  new GLTFExporter().parse(g, buf => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([buf], { type: 'model/gltf-binary' })); a.download = $('fname').value || fileName; a.click(); }, err => alert('書き出しに失敗しました: ' + err), { binary: true }); });
+$('copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('json').textContent); $('copy').textContent = 'コピーしました'; setTimeout(() => $('copy').textContent = 'カタログJSONをコピー', 1500); } catch (e) { alert('コピーできませんでした。手動で選択してください'); } });
+</script></body></html>
